@@ -1,0 +1,136 @@
+/* Custom CSS Variables */
+:root {
+  --bs-body-bg: #ffffff;
+  --bs-body-color: #000000;
+  --border-color: #e5e7eb;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Card Styles */
+.card {
+  border: 2px solid #000;
+  border-radius: 8px;
+}
+
+/* Button Styles */
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.btn-dark {
+  background-color: #000;
+  border-color: #000;
+}
+
+.btn-dark:hover {
+  background-color: #333;
+  border-color: #333;
+}
+
+.btn-outline-dark:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Table Styles */
+.table {
+  border: 1px solid var(--border-color);
+}
+
+.table thead {
+  background-color: #f9fafb;
+  border-bottom: 2px solid var(--border-color);
+}
+
+/* Badge Styles */
+.badge {
+  padding: 0.35rem 0.65rem;
+  font-weight: 500;
+}
+
+/* Form Styles */
+.form-control,
+.form-select {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #000;
+  box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation */
+.navbar {
+  border-bottom: 2px solid #000;
+  background-color: #fff !important;
+}
+
+.nav-link {
+  color: #000 !important;
+  font-weight: 500;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #666 !important;
+}
+
+/* Stats Cards */
+.stats-card {
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.stats-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #000;
+}
+
+.stats-label {
+  color: #666;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Book Card */
+.book-card {
+  border: 2px solid #000;
+  transition: transform 0.2s;
+}
+
+.book-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Modal Styles */
+.modal-content {
+  border: 2px solid #000;
+  border-radius: 8px;
+}
+
+.modal-header {
+  border-bottom: 2px solid #000;
+}
+
+/* Utility Classes */
+.text-balance {
+  text-wrap: balance;
+}
+
+.border-2 {
+  border-width: 2px !important;
+}
+
+.border-black {
+  border-color: #000 !important;
+}
