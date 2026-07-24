@@ -227,6 +227,27 @@ export default function StudentDocumentsPage() {
         "/admin/applications"
       )
 
+      // Send confirmation email to student
+      if (user.email) {
+        try {
+          await fetch('/api/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: user.email,
+              template: 'application_submitted',
+              data: {
+                name: profile.fullName || user.name || 'Student',
+                applicationId: application?.id || 'N/A',
+                submittedDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+              },
+            }),
+          })
+        } catch (err) {
+          console.error('Failed to send submission confirmation email:', err)
+        }
+      }
+
       toast({ 
         title: isResubmission ? "Application Resubmitted!" : "Application Submitted!", 
         description: "Your documents are successfully locked and under review.", 

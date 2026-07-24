@@ -91,7 +91,7 @@ export default function AdminSettingsPage() {
           "Filled-out Application Form",
           "School Registration Form",
           "Enrollment Receipt",
-          "School ID / Certificate of Non-issuance",
+          "School ID / Cert of Non-issuance",
           "Original Barangay Indigency",
           "Original Barangay Clearance",
           "Letter to City Mayor",

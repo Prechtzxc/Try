@@ -1,17 +1,33 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
-// Lazy initialization - only create Resend instance when API key is available
-let resendInstance: Resend | null = null
-function getResend(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null
-  if (!resendInstance) {
-    resendInstance = new Resend(process.env.RESEND_API_KEY)
+// Lazy initialization - only create transporter when SMTP credentials are available
+let transporter: nodemailer.Transporter | null = null
+async function getTransporter(): Promise<nodemailer.Transporter | null> {
+  if (!process.env.SMTP_USER) return null
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: true,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    })
+    try {
+      await transporter.verify()
+      console.log('SMTP authentication successful')
+    } catch (err) {
+      console.error('SMTP authentication error:', err)
+      transporter = null
+      return null
+    }
   }
-  return resendInstance
+  return transporter
 }
 
-type EmailTemplate = 'welcome' | 'application_submitted' | 'application_approved' | 'application_rejected' | 'password_reset' | 'verification_schedule' | 'financial_distribution'
+type EmailTemplate = 'welcome' | 'application_submitted' | 'application_approved' | 'application_rejected' | 'password_reset' | 'verification_schedule' | 'financial_distribution' | 'submission_portal_open' | 'payout_claimed'
 
 interface SendEmailRequest {
   to: string
@@ -211,6 +227,77 @@ const emailTemplates: Record<EmailTemplate, { subject: string; getBody: (data: R
       </div>
     `,
   },
+  submission_portal_open: {
+    subject: 'Submission Portal Now Open - BTS Scholarship',
+    getBody: (data) => `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">BTS Scholarship</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Municipality of Carmona</p>
+        </div>
+        <div style="padding: 30px; background: #f9fafb;">
+          <h2 style="color: #1f2937;">Submission Portal is Now Open!</h2>
+          <p style="color: #4b5563; line-height: 1.6;">
+            Dear ${data.name},
+          </p>
+          <p style="color: #4b5563; line-height: 1.6;">
+            The scholarship submission portal is now open. You can now submit your application and upload the required documents.
+          </p>
+          <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <p style="margin: 0; color: #6b7280;"><strong>Submission Period:</strong></p>
+            <p style="margin: 10px 0 0; color: #6b7280;"><strong>Start:</strong> ${data.startDate}</p>
+            <p style="margin: 10px 0 0; color: #6b7280;"><strong>End:</strong> ${data.endDate}</p>
+          </div>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${data.loginUrl}" style="background: #16a34a; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              Go to Dashboard
+            </a>
+          </div>
+          <p style="color: #4b5563; line-height: 1.6;">
+            Please ensure all your documents are ready before the submission deadline.
+          </p>
+        </div>
+        <div style="padding: 20px; text-align: center; color: #6b7280; font-size: 12px;">
+          <p>Municipality of Carmona - BTS Scholarship Program</p>
+        </div>
+      </div>
+    `,
+  },
+  payout_claimed: {
+    subject: 'Scholarship Claimed - BTS Scholarship',
+    getBody: (data) => `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 30px; text-align: center;">
+          <h1 style="color: white; margin: 0;">BTS Scholarship</h1>
+          <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0;">Municipality of Carmona</p>
+        </div>
+        <div style="padding: 30px; background: #f9fafb;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="background: #dcfce7; border-radius: 50%; width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center;">
+              <span style="font-size: 30px;">✓</span>
+            </div>
+          </div>
+          <h2 style="color: #16a34a; text-align: center;">Scholarship Claimed!</h2>
+          <p style="color: #4b5563; line-height: 1.6;">
+            Dear ${data.name},
+          </p>
+          <p style="color: #4b5563; line-height: 1.6;">
+            Your financial assistance for this scholarship cycle has been successfully claimed. Thank you for completing the process.
+          </p>
+          <div style="background: #dcfce7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <p style="margin: 0; color: #166534;"><strong>Amount:</strong> ${data.amount}</p>
+            <p style="margin: 10px 0 0; color: #166534;"><strong>Date Claimed:</strong> ${data.dateClaimed}</p>
+          </div>
+          <p style="color: #4b5563; line-height: 1.6;">
+            Please continue to monitor the portal for future announcements and scholarship cycles.
+          </p>
+        </div>
+        <div style="padding: 20px; text-align: center; color: #6b7280; font-size: 12px;">
+          <p>Municipality of Carmona - BTS Scholarship Program</p>
+        </div>
+      </div>
+    `,
+  },
 }
 
 export async function POST(request: NextRequest) {
@@ -227,9 +314,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid template' }, { status: 400 })
     }
 
-    // Check if Resend API key is configured
-    const resend = getResend()
-    if (!resend) {
+    // Check if SMTP is configured
+    const mailer = await getTransporter()
+    if (!mailer) {
       // Console-based testing mode
       console.log('\n========================================')
       console.log('EMAIL NOTIFICATION (Console Mode)')
@@ -243,26 +330,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         mode: 'console',
-        message: 'Email logged to console (Resend not configured)' 
+        message: 'Email logged to console (SMTP not configured or authentication failed)' 
       })
     }
 
-    // Send real email via Resend
-    const { data: emailData, error } = await resend.emails.send({
-      from: 'BTS Scholarship <noreply@resend.dev>',
-      to: [to],
+    // Log before sending
+    console.log('Sending email:', { to, subject: emailTemplate.subject, template })
+
+    // Send real email via Nodemailer
+    const info = await mailer.sendMail({
+      from: process.env.EMAIL_FROM,
+      to,
       subject: emailTemplate.subject,
       html: emailTemplate.getBody(data),
     })
 
-    if (error) {
-      console.error('Email send error:', error)
-      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
-    }
+    console.log('Email sent:', {
+      messageId: info.messageId,
+      accepted: info.accepted,
+      rejected: info.rejected,
+      response: info.response,
+    })
 
-    return NextResponse.json({ success: true, id: emailData?.id })
-  } catch (error) {
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
     console.error('Email API error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: error?.message || error?.toString() || 'Internal server error' }, { status: 500 })
   }
 }

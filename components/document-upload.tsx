@@ -129,7 +129,7 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
   const getDocumentType = (name: string): string | null => {
     const nameMap: Record<string, string> = {
       "Filled-out Application Form": "appForm", "School Registration Form": "regForm",
-      "Enrollment Receipt": "receipt", "School ID / Cert of Non-issuance": "schoolId",
+      "Enrollment Receipt": "receipt", "School ID / Certificate of Non-issuance": "schoolId", "School ID / Cert of Non-issuance": "schoolId",
       "Original Barangay Indigency": "indigency", "Original Barangay Clearance": "clearance",
       "Letter to City Mayor": "mayorLetter", "Voter's Certification": "votersCert",
       "Previous Grades": "grades",

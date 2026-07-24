@@ -172,6 +172,25 @@ export function ApplicationsTable({ limit }: ApplicationsTableProps) {
           type: "success",
           actionUrl: "/student/qrcode"
         })
+
+        if (appToApprove.email) {
+          try {
+            await fetch('/api/email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: appToApprove.email,
+                template: 'application_approved',
+                data: {
+                  name: appToApprove.fullName || 'Student',
+                  loginUrl: `${window.location.origin}/student/qrcode`,
+                },
+              }),
+            })
+          } catch (err) {
+            console.error('Failed to send approval email:', err)
+          }
+        }
       }
     } catch (error) {
       toast({ title: "Error", description: "Approval failed.", variant: "destructive" })
@@ -199,6 +218,25 @@ export function ApplicationsTable({ limit }: ApplicationsTableProps) {
         type: "warning",
         actionUrl: "/student/dashboard"
       })
+
+      if (applicationToReject.email) {
+        try {
+          await fetch('/api/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: applicationToReject.email,
+              template: 'application_rejected',
+              data: {
+                name: applicationToReject.fullName || 'Student',
+                reason: rejectionReason.trim(),
+              },
+            }),
+          })
+        } catch (err) {
+          console.error('Failed to send rejection email:', err)
+        }
+      }
       setRejectionReason("");
     } catch (error) {
       toast({ title: "Error", description: "Rejection failed.", variant: "destructive" })

@@ -35,6 +35,13 @@ const REQUIRED_DOCS = [
   "Previous Grades"
 ];
 
+function matchesDocName(docCategoryName: string | undefined, requiredName: string): boolean {
+  if (docCategoryName === requiredName) return true
+  if (requiredName === "School ID / Cert of Non-issuance" && docCategoryName === "School ID / Certificate of Non-issuance") return true
+  if (requiredName === "School ID / Certificate of Non-issuance" && docCategoryName === "School ID / Cert of Non-issuance") return true
+  return false
+}
+
 export default function ApplicationsPage() {
   const { toast } = useToast();
   
@@ -273,6 +280,24 @@ export default function ApplicationsPage() {
         read: false,
         createdAt: new Date().toISOString()
       });
+
+      try {
+        await fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: selectedApp.email,
+            template: status === 'approved' ? 'application_approved' : 'application_rejected',
+            data: {
+              name: selectedApp.name || selectedApp.fullName || 'Student',
+              reason: feedbackText || '',
+              loginUrl: `${window.location.origin}/student/${status === 'approved' ? 'qrcode' : 'documents'}`,
+            },
+          }),
+        })
+      } catch (emailError) {
+        console.error('Failed to send status email:', emailError)
+      }
       
       toast({
         title: `Application ${status === 'approved' ? 'Approved' : 'Resubmit Requested'}`,
@@ -376,7 +401,7 @@ export default function ApplicationsPage() {
 
   const isPdf = previewDoc?.url?.toLowerCase().endsWith('.pdf') || false;
   const validUploadedDocsCount = REQUIRED_DOCS.filter(reqName => 
-    studentDocs.some(d => (d.categoryName || d.name) === reqName)
+    studentDocs.some(d => matchesDocName(d.categoryName || d.name, reqName))
   ).length;
 
   return (
@@ -756,7 +781,7 @@ export default function ApplicationsPage() {
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {REQUIRED_DOCS.map((reqName, idx) => {
-                          const uploadedDoc = studentDocs.find(d => (d.categoryName || d.name) === reqName);
+                          const uploadedDoc = studentDocs.find(d => matchesDocName(d.categoryName || d.name, reqName));
 
                           return uploadedDoc ? (
                             <Card key={idx} className="rounded-3xl border-slate-200 shadow-sm overflow-hidden flex flex-col bg-white">
@@ -857,8 +882,8 @@ export default function ApplicationsPage() {
                  <div className="space-y-2">
                    <p className="text-sm font-bold text-slate-700">Select documents to resubmit:</p>
                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 max-h-[120px] overflow-y-auto border border-slate-200 rounded-xl p-2 bg-slate-50">
-                     {REQUIRED_DOCS.map((docName) => {
-                       const isUploaded = studentDocs.some(d => (d.categoryName || d.name) === docName);
+{REQUIRED_DOCS.map((docName) => {
+                        const isUploaded = studentDocs.some(d => matchesDocName(d.categoryName || d.name, docName));
                        return (
                          <label 
                            key={docName} 

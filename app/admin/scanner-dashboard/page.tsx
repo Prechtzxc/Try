@@ -165,6 +165,26 @@ export default function ScannerDashboardPage() {
         createdAt: new Date().toISOString()
       })
 
+      if (studentResult.email) {
+        try {
+          await fetch('/api/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: studentResult.email,
+              template: 'payout_claimed',
+              data: {
+                name: studentResult.fullName || 'Student',
+                amount: studentResult.distributionAmount || 'N/A',
+                dateClaimed: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+              },
+            }),
+          })
+        } catch (err) {
+          console.error('Failed to send claim email:', err)
+        }
+      }
+
       toast({ 
         title: "Payout Confirmed!", 
         description: `${studentResult.fullName} has been marked as claimed.`, 

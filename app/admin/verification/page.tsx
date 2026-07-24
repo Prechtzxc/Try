@@ -121,6 +121,7 @@ export default function QRVerificationPage() {
   const [verificationResult, setVerificationResult] = useState<{
     verified: boolean
     userId?: string
+    email?: string
     failureReason?: string
     failureDetails?: string
     student?: {
@@ -169,6 +170,7 @@ export default function QRVerificationPage() {
           setVerificationResult({
             verified: true,
             userId: studentUser.id,
+            email: studentUser.email,
             student: {
               id: profile.studentId || studentUser.id,
               name: profile.fullName || studentUser.name || "Unknown",
@@ -278,6 +280,26 @@ export default function QRVerificationPage() {
       const result = await markStudentAsClaimed(verificationResult.userId, user.id)
       
       if (result.success) {
+        if (verificationResult.email) {
+          try {
+            await fetch('/api/email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: verificationResult.email,
+                template: 'payout_claimed',
+                data: {
+                  name: verificationResult.student?.name || 'Student',
+                  amount: 'N/A',
+                  dateClaimed: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+                },
+              }),
+            })
+          } catch (err) {
+            console.error('Failed to send claim email:', err)
+          }
+        }
+
         toast({ title: "Financial Aid Claimed", description: result.message, className: "bg-emerald-600 text-white border-none" })
         setTimeout(() => {
           setActiveUserId(null)

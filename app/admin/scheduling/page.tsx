@@ -163,6 +163,32 @@ export default function SchedulingPage() {
       );
       await Promise.all(notifPromises);
 
+      // Send email notification to all students
+      const emailPromises = usersSnap.docs.map(async (u) => {
+        const userData = u.data();
+        if (userData.email) {
+          try {
+            await fetch('/api/email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: userData.email,
+                template: 'submission_portal_open',
+                data: {
+                  name: userData.name || 'Student',
+                  startDate: formatDate(subFormData.startDate),
+                  endDate: formatDate(subFormData.endDate),
+                  loginUrl: `${window.location.origin}/student/documents`,
+                },
+              }),
+            });
+          } catch (err) {
+            console.error('Failed to send email to', userData.email, err);
+          }
+        }
+      });
+      await Promise.all(emailPromises);
+
       toast({ title: "Success", description: "Submission portal is now OPEN." })
       setIsSubModalOpen(false)
       setSubFormData({ startDate: "", endDate: "" })
@@ -258,6 +284,36 @@ export default function SchedulingPage() {
         })
       );
       await Promise.all(notifPromises);
+
+      // Send email notification to affected students
+      const emailUsersSnap = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
+      const emailPromises = emailUsersSnap.docs
+        .filter(u => formData.barangays.includes(u.data().barangay))
+        .map(async (u) => {
+          const userData = u.data();
+          if (userData.email) {
+            try {
+              await fetch('/api/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  to: userData.email,
+                  template: 'financial_distribution',
+                  data: {
+                    name: userData.name || 'Student',
+                    barangay: userData.barangay || 'N/A',
+                    date: formatDate(formData.startDate),
+                    time: formData.startTime || 'N/A',
+                    amount: formData.distributionAmount || '0',
+                  },
+                }),
+              });
+            } catch (err) {
+              console.error('Failed to send distribution email to', userData.email, err);
+            }
+          }
+        });
+      await Promise.all(emailPromises);
 
       toast({ title: "Success", description: distributionType === "extension" ? "Distribution successfully extended." : "Financial Distribution is now OPEN." })
       setIsAddModalOpen(false)

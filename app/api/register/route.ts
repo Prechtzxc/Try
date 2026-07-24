@@ -161,6 +161,25 @@ export async function POST(request: Request) {
       // 4. MARK EMAIL AS USED
       await markEmailAsUsedDb(cleanEmail);
 
+      // 5. SEND WELCOME EMAIL
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+        await fetch(`${baseUrl}/api/email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: cleanEmail,
+            template: 'welcome',
+            data: {
+              name: combinedFullName,
+              loginUrl: `${baseUrl}/login`,
+            },
+          }),
+        })
+      } catch (emailError) {
+        console.error('Failed to send welcome email:', emailError)
+      }
+
       return NextResponse.json({ success: true, message: "Registration successful" }, { status: 201 })
     } catch (error: any) {
       console.error("Database Error:", error)
