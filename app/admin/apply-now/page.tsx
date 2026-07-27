@@ -14,7 +14,7 @@ import { useToast } from "@/components/ui/use-toast"
 // 🔥 IMPORT FIRESTORE REAL-TIME UTILS
 import { collection, query, onSnapshot, doc, updateDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
-import { addPreApprovedEmailDb } from "@/lib/storage"
+import { addRegistrationApprovalDb } from "@/lib/storage"
 
 type NewScholarApplication = {
   id: string
@@ -66,8 +66,13 @@ export default function ApplyNowPage() {
   const handleApproveApplication = async (application: NewScholarApplication) => {
     setIsProcessingId(application.id)
     try {
-      // 1. Add email to pre-approved emails list in Firestore
-      await addPreApprovedEmailDb(application.email.toLowerCase())
+      // 1. Add student to Registration Approval List
+      await addRegistrationApprovalDb({
+        firstName: application.firstName || "",
+        middleName: application.middleName || "",
+        lastName: application.lastName || "",
+        email: application.email.toLowerCase(),
+      })
 
       // 2. Update application status to approved
       await updateDoc(doc(db, "new_scholar_applications", application.id), { 
@@ -77,7 +82,7 @@ export default function ApplyNowPage() {
 
       toast({
         title: "Application Approved",
-        description: `${application.firstName} ${application.lastName}'s email has been whitelisted.`,
+        description: `${application.firstName} ${application.lastName} has been added to the Registration Approval List.`,
         className: "bg-emerald-600 text-white border-none"
       })
     } catch (error: any) {

@@ -280,24 +280,6 @@ export default function ApplicationsPage() {
         read: false,
         createdAt: new Date().toISOString()
       });
-
-      try {
-        await fetch('/api/email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: selectedApp.email,
-            template: status === 'approved' ? 'application_approved' : 'application_rejected',
-            data: {
-              name: selectedApp.name || selectedApp.fullName || 'Student',
-              reason: feedbackText || '',
-              loginUrl: `${window.location.origin}/student/${status === 'approved' ? 'qrcode' : 'documents'}`,
-            },
-          }),
-        })
-      } catch (emailError) {
-        console.error('Failed to send status email:', emailError)
-      }
       
       toast({
         title: `Application ${status === 'approved' ? 'Approved' : 'Resubmit Requested'}`,

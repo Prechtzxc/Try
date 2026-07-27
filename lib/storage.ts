@@ -417,30 +417,104 @@ export async function cancelStudentPayout(studentId: string, adminId: string, re
   }
 }
 
-// --- EMAILS ---
-export async function getPreApprovedEmailsListDb() {
+// --- REGISTRATION APPROVAL LIST ---
+export type RegistrationApproval = {
+  id: string
+  firstName: string
+  middleName: string
+  lastName: string
+  email: string
+  status: "Available" | "Registered"
+  createdAt: string
+  profilePicture?: string
+}
+
+export async function getRegistrationApprovalListDb(): Promise<RegistrationApproval[]> {
   const snapshot = await getDocs(collection(db, "pre_approved_emails"))
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as RegistrationApproval))
 }
 
-export async function isEmailPreApprovedDb(email: string): Promise<boolean> {
-  const q = query(collection(db, "pre_approved_emails"), where("email", "==", email.trim().toLowerCase()), where("isUsed", "==", false))
+export async function findRegistrationApprovalByEmailDb(email: string): Promise<RegistrationApproval | null> {
+  const q = query(collection(db, "pre_approved_emails"), where("email", "==", email.trim().toLowerCase()))
   const snapshot = await getDocs(q)
-  return !snapshot.empty
+  if (snapshot.empty) return null
+  return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as RegistrationApproval
 }
 
-export async function addPreApprovedEmailDb(email: string) {
-  await addDoc(collection(db, "pre_approved_emails"), { email: email.toLowerCase(), isUsed: false, createdAt: new Date().toISOString(), fullName: "" })
+export async function addRegistrationApprovalDb(data: { firstName: string; middleName: string; lastName: string; email: string }) {
+  await addDoc(collection(db, "pre_approved_emails"), {
+    firstName: data.firstName.trim(),
+    middleName: data.middleName.trim(),
+    lastName: data.lastName.trim(),
+    email: data.email.trim().toLowerCase(),
+    status: "Available",
+    createdAt: new Date().toISOString(),
+  })
 }
 
-export async function deletePreApprovedEmailDb(id: string) {
+export async function deleteRegistrationApprovalDb(id: string) {
   await deleteDoc(doc(db, "pre_approved_emails", id))
 }
 
-export async function markEmailAsUsedDb(email: string) {
+export async function markRegistrationApprovalAsRegisteredDb(email: string) {
   const q = query(collection(db, "pre_approved_emails"), where("email", "==", email.trim().toLowerCase()))
   const snapshot = await getDocs(q)
-  if (!snapshot.empty) await updateDoc(doc(db, "pre_approved_emails", snapshot.docs[0].id), { isUsed: true })
+  if (!snapshot.empty) {
+    await updateDoc(doc(db, "pre_approved_emails", snapshot.docs[0].id), { status: "Registered" })
+  }
+}
+
+export async function syncApprovalRecordWithUserDb(recordId: string, email: string): Promise<{ firstName: string; middleName: string; lastName: string; profilePicture: string } | null> {
+  try {
+    const user = await getUserByEmailDb(email)
+    if (!user) {
+      // Normalize old records by setting a status so counters work correctly
+      await updateDoc(doc(db, "pre_approved_emails", recordId), { status: "Available" })
+      return null
+    }
+
+    const profile = user.profileData as Record<string, any> | undefined
+
+    let firstName = ""
+    let middleName = ""
+    let lastName = ""
+
+    if (profile) {
+      firstName = typeof profile.firstName === "string" ? profile.firstName.trim() : ""
+      middleName = typeof profile.middleName === "string" ? profile.middleName.trim() : ""
+      lastName = typeof profile.lastName === "string" ? profile.lastName.trim() : ""
+    }
+
+    if (!firstName && !lastName) {
+      const fullName = (profile?.fullName || user.name || "") as string
+      if (fullName) {
+        const parts = fullName.trim().split(/\s+/)
+        firstName = parts[0] || ""
+        lastName = parts.length > 1 ? parts[parts.length - 1] : ""
+        middleName = parts.length > 2 ? parts.slice(1, -1).join(" ") : ""
+      }
+    }
+
+    const profilePicture = (
+      (typeof user.profilePicture === "string" && user.profilePicture) ||
+      (profile && typeof profile.studentPhoto === "string" && profile.studentPhoto) ||
+      (profile && typeof profile.profilePicture === "string" && profile.profilePicture) ||
+      ""
+    ) as string
+
+    const updateData: Record<string, any> = { status: "Registered" }
+    if (firstName) updateData.firstName = firstName
+    if (middleName) updateData.middleName = middleName
+    if (lastName) updateData.lastName = lastName
+    if (profilePicture) updateData.profilePicture = profilePicture
+
+    await updateDoc(doc(db, "pre_approved_emails", recordId), updateData)
+
+    return { firstName, middleName, lastName, profilePicture }
+  } catch (error) {
+    console.error("Failed to sync approval record:", error)
+    return null
+  }
 }
 
 // ============================================================================

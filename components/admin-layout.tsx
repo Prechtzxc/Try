@@ -44,6 +44,7 @@ import {
   AlertCircle,
   Mail,
   UsersRound,
+  UserCheck,
   Trash2,
   Check,
   Settings
@@ -228,7 +229,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   const allNavigationItems = [
     { href: getDashboardUrl(), icon: LayoutDashboard, label: "Dashboard", permission: "dashboard" },
-    { href: "/admin/approved-emails", icon: Mail, label: "Approved Emails", permission: "approved-emails" },
+    { href: "/admin/approved-emails", icon: UserCheck, label: "Registration Approval List", permission: "approved-emails" },
     { href: "/admin/applications", icon: FileText, label: "Applications", permission: "applications" },
     { href: "/admin/scholars", icon: Users, label: "Scholars", permission: "scholars" },
     { href: "/admin/scheduling", icon: Calendar, label: "Scheduling", permission: "scheduling" },

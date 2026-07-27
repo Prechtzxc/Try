@@ -3,8 +3,8 @@ import * as admin from "firebase-admin"
 import { 
   createUserDb, 
   createApplicationDb, 
-  isEmailPreApprovedDb, 
-  markEmailAsUsedDb,
+  findRegistrationApprovalByEmailDb, 
+  markRegistrationApprovalAsRegisteredDb,
   getAllUsersDb 
 } from "@/lib/storage"
 
@@ -46,12 +46,21 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "This email is already registered. Please sign in instead." }, { status: 409 })
       }
 
-      const isApproved = await isEmailPreApprovedDb(cleanEmail)
-      if (!isApproved) {
-        return NextResponse.json({ error: "This email is not authorized to register." }, { status: 403 })
+      const approval = await findRegistrationApprovalByEmailDb(cleanEmail)
+      if (!approval) {
+        return NextResponse.json({ error: "This email is not authorized for registration." }, { status: 403 })
       }
 
-      return NextResponse.json({ success: true }) 
+      if (approval.status === "Registered") {
+        return NextResponse.json({ error: "This registration has already been completed." }, { status: 409 })
+      }
+
+      return NextResponse.json({ 
+        success: true,
+        firstName: approval.firstName || "",
+        middleName: approval.middleName || "",
+        lastName: approval.lastName || "",
+      }) 
     }
 
     // --- HANDLE FULL REGISTRATION SUBMISSION ---
@@ -65,9 +74,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "This email is already registered." }, { status: 409 })
     }
 
-    const isApproved = await isEmailPreApprovedDb(cleanEmail);
-    if (!isApproved) {
-      return NextResponse.json({ error: "This email is not authorized to register." }, { status: 403 })
+    const approval = await findRegistrationApprovalByEmailDb(cleanEmail);
+    if (!approval) {
+      return NextResponse.json({ error: "This email is not authorized for registration." }, { status: 403 })
+    }
+
+    if (approval.status === "Registered") {
+      return NextResponse.json({ error: "This registration has already been completed." }, { status: 409 })
     }
 
     try {
@@ -158,27 +171,8 @@ export async function POST(request: Request) {
 
       await createApplicationDb(applicationPayload as any)
 
-      // 4. MARK EMAIL AS USED
-      await markEmailAsUsedDb(cleanEmail);
-
-      // 5. SEND WELCOME EMAIL
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-        await fetch(`${baseUrl}/api/email`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: cleanEmail,
-            template: 'welcome',
-            data: {
-              name: combinedFullName,
-              loginUrl: `${baseUrl}/login`,
-            },
-          }),
-        })
-      } catch (emailError) {
-        console.error('Failed to send welcome email:', emailError)
-      }
+      // 4. MARK EMAIL AS REGISTERED
+      await markRegistrationApprovalAsRegisteredDb(cleanEmail);
 
       return NextResponse.json({ success: true, message: "Registration successful" }, { status: 201 })
     } catch (error: any) {

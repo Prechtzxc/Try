@@ -96,6 +96,10 @@ export default function RegisterPage() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [step]);
+
   const updateField = (field: keyof FormData, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -180,8 +184,9 @@ export default function RegisterPage() {
       
       if (!response.ok) {
         let errorMessage = data.error || "Verification failed";
-        if (errorMessage.toLowerCase().includes("already")) errorMessage = "Email already registered";
-        else if (errorMessage.toLowerCase().includes("authorized") || errorMessage.toLowerCase().includes("approved")) errorMessage = "Your email is not approved";
+        if (errorMessage.toLowerCase().includes("already completed")) errorMessage = "This registration has already been completed.";
+        else if (errorMessage.toLowerCase().includes("already registered")) errorMessage = "Email already registered";
+        else if (errorMessage.toLowerCase().includes("authorized")) errorMessage = "This email is not authorized for registration.";
 
         setErrors({ email: errorMessage });
         toast({ variant: "destructive", title: "Verification Failed", description: errorMessage });
@@ -190,6 +195,9 @@ export default function RegisterPage() {
       }
       
       setEmailValidated(true);
+      updateField("firstName", data.firstName || "");
+      updateField("middleName", data.middleName || "");
+      updateField("lastName", data.lastName || "");
       setErrors({ email: "" });
       setIsLoading(false);
       return true;
@@ -443,14 +451,31 @@ export default function RegisterPage() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     
                     {step === 0 && (
-                      <div className="space-y-2 max-w-md mx-auto pt-6">
-                        <Label htmlFor="email" className="flex items-center gap-1">
-                          Email Address
-                          {emailValidated && <CheckCircle className="h-4 w-4 text-green-500" />}
-                        </Label>
-                        <Input id="email" type="email" placeholder="name@example.com" value={formData.email} onChange={(e) => updateField("email", e.target.value)} className="h-12 rounded-xl" />
-                        <p className="text-sm text-slate-600">Only pre-approved emails can register for the scholarship program.</p>
-                        {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                      <div className="space-y-4 max-w-md mx-auto pt-6">
+                        <div className="space-y-2">
+                          <Label htmlFor="email" className="flex items-center gap-1">
+                            Email Address
+                            {emailValidated && <CheckCircle className="h-4 w-4 text-green-500" />}
+                          </Label>
+                          <Input id="email" type="email" placeholder="name@example.com" value={formData.email} onChange={(e) => updateField("email", e.target.value)} className="h-12 rounded-xl" />
+                          <p className="text-sm text-slate-600">Only pre-approved emails can register for the scholarship program.</p>
+                          {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
+                        </div>
+
+                        {!emailValidated && (
+                          <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
+                            <h4 className="text-sm font-bold text-green-800 mb-2">Registration Notice</h4>
+                            <div className="text-xs text-green-700 space-y-2 leading-relaxed">
+                              <p>Before registering, kindly proceed to the Municipality of Carmona.</p>
+                              <p>Please bring the following requirement:</p>
+                              <ul className="list-disc list-inside pl-1 space-y-0.5">
+                                <li>Voter&apos;s Certificate</li>
+                              </ul>
+                              <p className="font-medium mt-2">Only students included in the Registration Approval List may proceed with account registration. For more information, kindly proceed to the CAYDO Office.</p>
+                              <p>After your email has been verified, your registered name will automatically appear in the next step.</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -502,20 +527,18 @@ export default function RegisterPage() {
 
                           <div className="w-full lg:w-2/3">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                              
+
                               <div className="space-y-2 md:col-span-2">
                                 <Label>Full Name</Label>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                   <div className="space-y-1">
-                                    <Input placeholder="First Name" value={formData.firstName} onChange={(e) => updateField("firstName", e.target.value)} className="h-11 rounded-xl" />
-                                    {errors.firstName && <p className="text-xs text-red-600">{errors.firstName}</p>}
+                                    <Input value={formData.firstName} disabled readOnly className="h-11 rounded-xl bg-slate-100 text-slate-600 cursor-not-allowed" />
                                   </div>
                                   <div className="space-y-1">
-                                    <Input placeholder="Middle Name (Optional)" value={formData.middleName} onChange={(e) => updateField("middleName", e.target.value)} className="h-11 rounded-xl" />
+                                    <Input value={formData.middleName || ""} disabled readOnly placeholder="—" className="h-11 rounded-xl bg-slate-100 text-slate-600 cursor-not-allowed" />
                                   </div>
                                   <div className="space-y-1">
-                                    <Input placeholder="Last Name" value={formData.lastName} onChange={(e) => updateField("lastName", e.target.value)} className="h-11 rounded-xl" />
-                                    {errors.lastName && <p className="text-xs text-red-600">{errors.lastName}</p>}
+                                    <Input value={formData.lastName} disabled readOnly className="h-11 rounded-xl bg-slate-100 text-slate-600 cursor-not-allowed" />
                                   </div>
                                 </div>
                               </div>
