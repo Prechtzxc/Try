@@ -35,7 +35,12 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:;",
+            // 🔥 FIX: Added `frame-src 'self' https:;` so the Cloudinary PDF viewer
+            // (res.cloudinary.com) can be rendered inside the <iframe> preview.
+            // Without frame-src, CSP falls back to `default-src 'self'`, which blocks
+            // all cross-origin iframes -> broken PDF preview. Images were unaffected
+            // because `img-src` already allows `https:`.
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https:; frame-src 'self' https:;",
           },
         ],
       },

@@ -187,6 +187,10 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
       if (!res.ok) throw new Error("Failed to upload to Cloudinary")
 
       const data = await res.json()
+      // 🔥 TEMP DEBUG: verify Cloudinary response + the URL that gets persisted to Firestore
+      console.log("🔥 [Upload] Cloudinary raw response", documentType, "->", data)
+      console.log("🔥 [Upload] secure_url being saved to Firestore:", data.secure_url)
+      if (!data.secure_url) console.error("🔥 [Upload] ERROR: no secure_url in Cloudinary response")
       setDocuments(prev => ({ ...prev, [documentType]: { ...prev[documentType], progress: 90 } }))
 
       await createDocumentDb({
@@ -444,12 +448,15 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
               onMouseUp={!isPdf ? handleMouseUp : undefined} onMouseLeave={!isPdf ? handleMouseUp : undefined}
             >
               {isPdf ? (
-                <iframe src={`${previewDoc.url}#toolbar=1&navpanes=0&view=FitH`} className="w-full h-full bg-white shadow-2xl" title={previewDoc.fileName} />
+                // 🔥 TEMP DEBUG: log the EXACT URL the iframe renders + flag deprecated image path
+                (console.log("[Preview] [PDF] iframe src:", `${previewDoc.url}#toolbar=1&navpanes=0&view=FitH`),
+                <iframe src={`${previewDoc.url}#toolbar=1&navpanes=0&view=FitH`} className="w-full h-full bg-white shadow-2xl" title={previewDoc.fileName} />)
               ) : (
+                (console.log("[Preview] [IMAGE] img src:", previewDoc?.url),
                 <img src={previewDoc?.url} alt={previewDoc?.fileName} draggable={false}
                   style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`, transition: isDragging ? 'none' : 'transform 0.1s ease-out' }}
                   className="max-h-[90vh] w-auto object-contain drop-shadow-2xl rounded-md pointer-events-none select-none"
-                />
+                />)
               )}
             </div>
           </div>

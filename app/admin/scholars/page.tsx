@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import { PermissionGuard } from "@/components/permission-guard"
 import { DataPagination } from "@/components/data-pagination"
+import { ScholarDetailsModal } from "@/components/scholar-details-modal"
 import { 
   Search, MapPin, Loader2, Users, Mail, GraduationCap, School, CheckCircle, History, CalendarDays, Ban
 } from "lucide-react"
@@ -38,6 +39,15 @@ export default function ScholarsPage() {
   const [activePage, setActivePage] = useState(1)
   const [historyPage, setHistoryPage] = useState(1)
   const ITEMS_PER_PAGE = 10
+
+  // 🔥 NEW: Scholar Details Modal State
+  const [selectedScholar, setSelectedScholar] = useState<any | null>(null)
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+
+  const openScholarDetails = (scholar: any) => {
+    setSelectedScholar(scholar)
+    setIsDetailsOpen(true)
+  }
 
   // 🔥 NEW: Dynamic Barangays State
   const [barangaysList, setBarangaysList] = useState<string[]>([]) 
@@ -360,7 +370,7 @@ export default function ScholarsPage() {
                             </TableHeader>
                             <TableBody className="bg-white">
                               {paginatedScholars.map((scholar) => (
-                                <TableRow key={scholar.id} className="hover:bg-emerald-50/30 transition-colors border-slate-100">
+                                <TableRow key={scholar.id} onClick={() => openScholarDetails(scholar)} className="hover:bg-emerald-50/30 transition-colors border-slate-100 cursor-pointer">
                                   <TableCell className="pl-8 py-4 align-middle">
                                     <div className="flex items-center gap-4">
                                       <Avatar className="h-11 w-11 border-2 border-white shadow-sm shrink-0 bg-emerald-100">
@@ -456,7 +466,7 @@ export default function ScholarsPage() {
                             </TableHeader>
                             <TableBody className="bg-white">
                               {paginatedArchivedScholars.map((scholar) => (
-                                <TableRow key={scholar.id} className="hover:bg-slate-50 transition-colors border-slate-100">
+                                <TableRow key={scholar.id} onClick={() => openScholarDetails(scholar)} className="hover:bg-slate-50 transition-colors border-slate-100 cursor-pointer">
                                   
                                   <TableCell className="pl-8 py-4 align-middle">
                                     <div className="flex items-center gap-4">
@@ -535,6 +545,15 @@ export default function ScholarsPage() {
               </CardContent>
             </Tabs>
           </Card>
+
+          <ScholarDetailsModal
+            open={isDetailsOpen}
+            onOpenChange={(open) => {
+              setIsDetailsOpen(open)
+              if (!open) setSelectedScholar(null)
+            }}
+            scholar={selectedScholar}
+          />
 
         </div>
       </AdminLayout>

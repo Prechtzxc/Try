@@ -1000,12 +1000,15 @@ export default function ApplicationsPage() {
                   onMouseLeave={!isPdf ? handleMouseUp : undefined}
                 >
                   {isPdf ? (
+                    // 🔥 TEMP DEBUG: log the EXACT URL the iframe renders
+                    (console.log("[Preview] [PDF] iframe src:", `${previewDoc?.url}#toolbar=1&navpanes=0&view=FitH`),
                     <iframe 
                       src={`${previewDoc?.url}#toolbar=1&navpanes=0&view=FitH`} 
                       className="w-full h-full bg-white shadow-2xl"
                       title={previewDoc?.name || "Document Preview"}
-                    />
+                    />)
                   ) : (
+                    (console.log("[Preview] [IMAGE] img src:", previewDoc?.url),
                     <img 
                       src={previewDoc?.url} 
                       alt={previewDoc?.name} 
@@ -1015,7 +1018,7 @@ export default function ApplicationsPage() {
                         transition: isDragging ? 'none' : 'transform 0.1s ease-out'
                       }}
                       className="max-h-[90vh] w-auto object-contain drop-shadow-2xl rounded-md pointer-events-none select-none"
-                    />
+                    />)
                   )}
                 </div>
               </div>

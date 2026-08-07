@@ -8,9 +8,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { MoreHorizontal, Check, X, FileText, Loader2, ExternalLink, ChevronRight, User } from "lucide-react"
+import { MoreHorizontal, Check, X, FileText, Loader2, User } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { DocumentPreviewModal } from "@/components/document-preview-modal"
 
 // 🔥 IMPORT FIRESTORE REAL-TIME UTILS
 import { collection, onSnapshot, query, where } from "firebase/firestore"
@@ -27,18 +27,6 @@ type Application = BaseApplication & { studentPhoto?: string }
 
 interface ApplicationsTableProps {
   limit?: number
-}
-
-const openBase64InNewTab = async (base64Data: string) => {
-  try {
-    const response = await fetch(base64Data)
-    const blob = await response.blob()
-    const blobUrl = URL.createObjectURL(blob)
-    window.open(blobUrl, '_blank')
-  } catch (error) {
-    console.error("Failed to open document", error)
-    window.open(base64Data, '_blank')
-  }
 }
 
 export function ApplicationsTable({ limit }: ApplicationsTableProps) {
@@ -335,106 +323,23 @@ export function ApplicationsTable({ limit }: ApplicationsTableProps) {
         </Table>
       </div>
 
-      {/* --- SPLIT-PANE DOCUMENTS MODAL --- */}
-      <Dialog open={documentsModalOpen} onOpenChange={(open) => {
-          setDocumentsModalOpen(open);
-          if (!open) {
-              setSelectedApplication(null);
-              setStudentDocs([]);
-              setActiveDocument(null);
-          }
-      }}>
-        <DialogContent className="max-w-6xl w-[95vw] h-[90vh] flex flex-col p-0 overflow-hidden bg-slate-50 border-none shadow-2xl rounded-3xl">
-          <DialogHeader className="px-6 py-4 border-b border-slate-200 bg-white shrink-0">
-            <DialogTitle className="text-xl font-black uppercase text-slate-800 tracking-tight">Documents for {selectedApplication?.fullName}</DialogTitle>
-            <DialogDescription className="font-medium text-slate-500">Select a document from the sidebar to view it.</DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex flex-1 overflow-hidden">
-            <div className="w-1/3 max-w-[300px] border-r border-slate-200 bg-white flex flex-col z-10">
-              <ScrollArea className="flex-1">
-                <div className="p-4 space-y-3">
-                  {loadingDocs ? (
-                    <div className="flex items-center justify-center py-10">
-                      <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-                    </div>
-                  ) : studentDocs.length === 0 ? (
-                    <p className="text-sm font-bold uppercase tracking-widest text-slate-400 text-center py-10">No documents found.</p>
-                  ) : (
-                    studentDocs.map((doc) => (
-                      <button
-                        key={doc.id}
-                        onClick={() => setActiveDocument(doc)}
-                        className={`w-full text-left p-3 rounded-xl border transition-all flex flex-col gap-2 ${
-                          activeDocument?.id === doc.id 
-                            ? 'bg-emerald-50 border-emerald-500 ring-1 ring-emerald-500 shadow-sm' 
-                            : 'bg-white border-slate-200 hover:border-emerald-300 hover:bg-slate-50'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between w-full">
-                          <span className="font-bold text-xs text-slate-800 pr-2 leading-tight uppercase">{doc.name}</span>
-                        </div>
-                        <div className="flex items-center justify-between w-full text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                          <span>{doc.fileSize}</span>
-                          <Badge variant="outline" className={`text-[9px] shadow-none ${doc.type === 'pdf' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>{doc.type}</Badge>
-                        </div>
-                      </button>
-                    ))
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
-
-            <div className="flex-1 bg-slate-900 flex flex-col relative overflow-hidden">
-              {activeDocument ? (
-                <div className="flex-1 flex flex-col w-full h-full">
-                  <div className="h-14 border-b border-white/10 bg-slate-800/90 backdrop-blur-md flex items-center justify-between px-6 shrink-0 shadow-sm z-10 absolute top-0 w-full">
-                    <span className="font-bold text-xs uppercase tracking-widest text-white flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-emerald-400"/>
-                      {activeDocument.name}
-                    </span>
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      className="text-white hover:bg-white/20 rounded-xl text-xs font-bold"
-                      onClick={() => openBase64InNewTab(activeDocument.url)}
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" /> Open in New Tab
-                    </Button>
-                  </div>
-
-                  <div className="flex-1 overflow-hidden flex items-center justify-center pt-14">
-                    {activeDocument.type === 'pdf' ? (
-                      <div className="w-full h-full bg-white">
-                        <object data={`${activeDocument.url}#toolbar=0&navpanes=0&view=FitH`} type="application/pdf" className="w-full h-full">
-                          <div className="flex flex-col items-center justify-center h-full text-center space-y-4 p-8 bg-slate-100">
-                            <FileText className="h-16 w-16 text-slate-300" />
-                            <p className="text-slate-500 font-medium">PDF Viewer not supported in this browser.</p>
-                            <Button onClick={() => openBase64InNewTab(activeDocument.url)} className="rounded-xl font-bold bg-emerald-600 hover:bg-emerald-700">Download / Open PDF</Button>
-                          </div>
-                        </object>
-                      </div>
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center p-4">
-                        <img src={activeDocument.url} alt={activeDocument.name} className="max-w-full max-h-full object-contain rounded-md drop-shadow-2xl select-none" draggable={false} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-slate-600 bg-slate-50">
-                  <FileText className="h-16 w-16 mb-4 opacity-20 text-slate-400" />
-                  <p className="font-bold uppercase tracking-widest text-xs">Select a document to preview</p>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          <DialogFooter className="p-4 border-t border-slate-200 bg-white shrink-0">
-            <Button variant="outline" onClick={() => setDocumentsModalOpen(false)} className="rounded-xl font-bold">Close Viewer</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* --- SPLIT-PANE DOCUMENTS MODAL (shared) --- */}
+      <DocumentPreviewModal
+        open={documentsModalOpen}
+        onOpenChange={(open) => {
+            setDocumentsModalOpen(open);
+            if (!open) {
+                setSelectedApplication(null);
+                setStudentDocs([]);
+                setActiveDocument(null);
+            }
+        }}
+        documents={studentDocs}
+        loading={loadingDocs}
+        studentName={selectedApplication?.fullName}
+        activeDocument={activeDocument}
+        onSelectDocument={setActiveDocument}
+      />
 
       {/* --- REJECTION MODAL --- */}
       <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>

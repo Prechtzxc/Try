@@ -4,11 +4,12 @@ import { useState, useEffect } from "react"
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { HowToApplyModal } from "@/components/how-to-apply-modal"
 
 export function HeroSection() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [isTrackLoading, setIsTrackLoading] = useState(false)
-  const [isApplyLoading, setIsApplyLoading] = useState(false) // 🔥 Added state for Apply button
+  const [isHowToApplyOpen, setIsHowToApplyOpen] = useState(false) // 🔥 Controls the How to Apply modal
   const router = useRouter()
 
   useEffect(() => {
@@ -29,11 +30,8 @@ export function HeroSection() {
   }
 
   const handleApplyClick = () => {
-    setIsApplyLoading(true)
-    // Redirect to register page
-    setTimeout(() => {
-      router.push("/register")
-    }, 600)
+    // Open the How to Apply onboarding modal instead of navigating away
+    setIsHowToApplyOpen(true)
   }
 
   return (
@@ -147,24 +145,14 @@ export function HeroSection() {
             }`}
             style={{ animationDelay: "0.9s" }}
           >
-            {/* 🔥 NEW: Apply Now Button */}
+            {/* 🔥 NEW: How to Apply Button (opens onboarding modal) */}
             <Button
               size="lg"
               onClick={handleApplyClick}
-              disabled={isApplyLoading || isTrackLoading}
+              disabled={isTrackLoading}
               className="relative text-white bg-green-600 hover:bg-green-700 px-12 py-6 text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 rounded-full disabled:opacity-80 disabled:cursor-not-allowed disabled:transform-none min-w-[200px] font-bold"
             >
-              {isApplyLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Loading...</span>
-                </>
-              ) : (
-                "Apply Now"
-              )}
+              How to Apply
             </Button>
 
             {/* Existing: Track Application Button */}
@@ -172,7 +160,7 @@ export function HeroSection() {
               variant="ghost"
               size="lg"
               onClick={handleTrackClick}
-              disabled={isTrackLoading || isApplyLoading}
+              disabled={isTrackLoading}
               className="relative text-green-700 hover:text-green-800 hover:bg-green-50 px-12 py-6 text-lg transition-all duration-300 border-2 border-green-200/50 hover:border-green-300 shadow-lg hover:shadow-xl transform hover:scale-105 rounded-full disabled:opacity-80 disabled:cursor-not-allowed disabled:transform-none min-w-[200px] font-bold bg-white/50 backdrop-blur-sm"
             >
               {isTrackLoading ? (
@@ -226,6 +214,9 @@ export function HeroSection() {
         .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
         .animate-scale-in { animation: scaleIn 0.5s ease-out forwards; }
       `}</style>
+
+      {/* 🔥 How to Apply onboarding modal */}
+      <HowToApplyModal open={isHowToApplyOpen} onOpenChange={setIsHowToApplyOpen} />
     </section>
   )
 }

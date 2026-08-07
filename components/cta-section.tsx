@@ -1,10 +1,14 @@
 "use client"
 
-import Link from "next/link"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { HowToApplyModal } from "@/components/how-to-apply-modal"
 
 export function CtaSection() {
+  const [isHowToApplyOpen, setIsHowToApplyOpen] = useState(false) // 🔥 Controls the How to Apply modal
+
   return (
+    <>
     <section className="relative w-full overflow-hidden bg-gradient-to-br from-green-800 via-green-700 to-green-600 pt-28 pb-16">
       
       {/* Top white wave cutting into the green background */}
@@ -39,16 +43,15 @@ export function CtaSection() {
           </div>
 
           <div className="flex flex-col gap-3 min-[400px]:flex-row mt-4">
-            {/* 🔥 FIX: Changed href to /register and text to Apply Now */}
-            <Link href="/register">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white/30 bg-white/10 text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/50 hover:-translate-y-1 rounded-full px-8 font-bold"
-              >
-                Apply Now
-              </Button>
-            </Link>
+            {/* 🔥 FIX: Opens the How to Apply onboarding modal */}
+            <Button
+              size="lg"
+              onClick={() => setIsHowToApplyOpen(true)}
+              variant="outline"
+              className="border-2 border-white/30 bg-white/10 text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/50 hover:-translate-y-1 rounded-full px-8 font-bold"
+            >
+              How to Apply
+            </Button>
           </div>
 
           {/* Floating elements */}
@@ -79,5 +82,9 @@ export function CtaSection() {
       
       {/* Flat bottom transition to footer (No bottom wave) */}
     </section>
+
+    {/* 🔥 How to Apply onboarding modal */}
+    <HowToApplyModal open={isHowToApplyOpen} onOpenChange={setIsHowToApplyOpen} />
+    </>
   )
 }

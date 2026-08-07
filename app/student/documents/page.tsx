@@ -138,6 +138,11 @@ export default function StudentDocumentsPage() {
 
       const data = await res.json()
 
+      // 🔥 TEMP DEBUG: verify Cloudinary response + the URL that gets persisted to Firestore
+      console.log("🔥 [Upload] Cloudinary raw response", reqName, "->", data)
+      console.log("🔥 [Upload] secure_url being saved to Firestore:", data.secure_url)
+      if (!data.secure_url) console.error("🔥 [Upload] ERROR: no secure_url in Cloudinary response")
+
       // Check if replacing an existing DB doc to avoid duplicates
       const existingDbDoc = documents.find(d => (d.categoryName || d.name) === reqName);
       if (existingDbDoc) {
@@ -550,9 +555,12 @@ export default function StudentDocumentsPage() {
             </DialogHeader>
             <div className="flex-1 w-full bg-slate-900 flex items-center justify-center overflow-hidden">
               {viewingDoc?.isPdf ? (
-                <iframe src={`${viewingDoc.url}#toolbar=0`} className="w-full h-full border-none bg-white" title="Document Preview" />
+                // 🔥 TEMP DEBUG: log the EXACT URL the iframe renders
+                (console.log("[Preview] [PDF] iframe src:", `${viewingDoc.url}#toolbar=0`),
+                <iframe src={`${viewingDoc.url}#toolbar=0`} className="w-full h-full border-none bg-white" title="Document Preview" />)
               ) : (
-                <img src={viewingDoc?.url} alt="Document Preview" className="w-full h-full object-contain bg-slate-900" />
+                (console.log("[Preview] [IMAGE] img src:", viewingDoc?.url),
+                <img src={viewingDoc?.url} alt="Document Preview" className="w-full h-full object-contain bg-slate-900" />)
               )}
             </div>
           </DialogContent>
