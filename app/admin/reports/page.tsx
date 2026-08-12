@@ -649,12 +649,12 @@ export default function ReportsPage() {
                       <Table className="min-w-full">
                         <TableHeader className="bg-white">
                           <TableRow className="border-slate-100">
-                            <TableHead className="w-[20%] pl-6 font-black text-slate-400 uppercase text-[10px] tracking-widest py-4">Ended Date</TableHead>
-                            <TableHead className="w-[15%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Submission Window</TableHead>
-                            <TableHead className="w-[15%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Distribution Window</TableHead>
-                            <TableHead className="w-[15%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Scheduled Amount</TableHead>
-                            <TableHead className="w-[15%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Approved</TableHead>
-                            <TableHead className="w-[20%] text-right pr-6 font-black text-slate-400 uppercase text-[10px] tracking-widest">Action</TableHead>
+                            <TableHead className="w-[20%] pl-6 font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Ended Date</TableHead>
+                            <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Submission Window</TableHead>
+                            <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Distribution Window</TableHead>
+                            <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Scheduled Amount</TableHead>
+                            <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Approved</TableHead>
+                            <TableHead className="w-[20%] text-right pr-6 font-bold text-gray-900 uppercase text-xs tracking-widest">Action</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody className="bg-white">
@@ -799,11 +799,11 @@ export default function ReportsPage() {
                                               <Table className="min-w-[800px] w-full">
                                                 <TableHeader className="bg-white sticky top-0 shadow-sm z-10">
                                                   <TableRow className="border-slate-100">
-                                                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-4 py-4 w-[25%]">Student Name</TableHead>
-                                                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest w-[30%]">School / Program</TableHead>
-                                                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest w-[15%]">Barangay</TableHead>
-                                                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-center w-[15%]">Status</TableHead>
-                                                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pr-4 text-right w-[15%]">Amount Claimed</TableHead>
+                                                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-4 py-4 w-[25%]">Student Name</TableHead>
+                                                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest w-[30%]">School / Program</TableHead>
+                                                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest w-[15%]">Barangay</TableHead>
+                                                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-center w-[15%]">Status</TableHead>
+                                                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pr-4 text-right w-[15%]">Amount Claimed</TableHead>
                                                   </TableRow>
                                                 </TableHeader>
                                                 <TableBody>

@@ -362,10 +362,10 @@ export default function ScholarsPage() {
                           <Table>
                             <TableHeader className="bg-slate-50/50">
                               <TableRow className="border-slate-100 hover:bg-transparent">
-                                <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-8 py-5">Student</TableHead>
-                                <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Academic Info</TableHead>
-                                <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Barangay</TableHead>
-                                <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-right pr-8 py-5">Payout Status</TableHead>
+                                <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-8 py-5">Student</TableHead>
+                                <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Academic Info</TableHead>
+                                <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Barangay</TableHead>
+                                <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-right pr-8 py-5">Payout Status</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody className="bg-white">
@@ -458,10 +458,10 @@ export default function ScholarsPage() {
                           <Table>
                             <TableHeader className="bg-slate-50/50">
                               <TableRow className="border-slate-100 hover:bg-transparent">
-                                <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-8 py-5">Student</TableHead>
-                                <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Academic Info</TableHead>
-                                <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Barangay</TableHead>
-                                <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-right pr-8 py-5">Claim / End Date</TableHead>
+                                <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-8 py-5">Student</TableHead>
+                                <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Academic Info</TableHead>
+                                <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Barangay</TableHead>
+                                <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-right pr-8 py-5">Claim / End Date</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody className="bg-white">

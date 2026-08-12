@@ -486,13 +486,13 @@ export default function QRVerificationPage() {
               <CardDescription className="font-medium text-slate-500 mt-1">Scan QR code or enter student details manually</CardDescription>
             </CardHeader>
             <CardContent className="p-6 md:p-8 pt-6">
-              <Tabs defaultValue="manual" className="w-full">
+              <Tabs defaultValue="qr" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6 bg-slate-100 p-1 rounded-2xl h-14">
-                  <TabsTrigger value="manual" className="rounded-xl font-bold flex items-center gap-2 h-full text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                    <Keyboard className="h-4 w-4" /> Manual
-                  </TabsTrigger>
                   <TabsTrigger value="qr" className="rounded-xl font-bold flex items-center gap-2 h-full text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">
                     <QrCode className="h-4 w-4" /> Scanner
+                  </TabsTrigger>
+                  <TabsTrigger value="manual" className="rounded-xl font-bold flex items-center gap-2 h-full text-xs sm:text-sm data-[state=active]:bg-white data-[state=active]:shadow-sm">
+                    <Keyboard className="h-4 w-4" /> Manual
                   </TabsTrigger>
                 </TabsList>
                 

@@ -78,20 +78,6 @@ export default function HistoryPage() {
   return (
     <StudentLayout>
       <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-fade-in pb-12">
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-slate-200 rounded-full filter blur-[80px] opacity-30 -mr-20 -mt-20 pointer-events-none"></div>
-          <div className="relative">
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
-              <div className="p-2 sm:p-3 bg-slate-100 rounded-xl">
-                <History className="h-6 w-6 sm:h-8 sm:w-8 text-slate-600" />
-              </div>
-              Application Archives
-            </h1>
-            <p className="text-sm sm:text-base text-slate-500 font-medium mt-2 max-w-xl">
-              Review your past scholarship applications, documents, and final outcomes from previous cycles.
-            </p>
-          </div>
-        </div>
 
         {isLoading ? (
           <div className="py-24 flex flex-col items-center justify-center gap-4">

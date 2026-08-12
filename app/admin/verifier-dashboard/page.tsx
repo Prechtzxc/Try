@@ -25,7 +25,7 @@ function StatCard({ title, value, description, icon, iconBg, iconColor }: StatCa
   return (
     <Card className="relative overflow-hidden transition-all duration-200 border border-slate-100 shadow-sm hover:shadow-md rounded-3xl bg-white h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-500">{title}</CardTitle>
+        <CardTitle className="text-xs font-bold uppercase tracking-widest text-gray-900">{title}</CardTitle>
         <div className={`p-2 sm:p-3 rounded-2xl ${iconBg}`}>
           <div className={iconColor}>{icon}</div>
         </div>

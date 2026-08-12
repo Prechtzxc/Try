@@ -505,11 +505,11 @@ export default function ApplicationsPage() {
                             <Table>
                               <TableHeader className="bg-slate-50/50">
                                 <TableRow className="border-slate-100 hover:bg-transparent">
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-8 py-5">Applicant</TableHead>
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Academic Info</TableHead>
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Barangay</TableHead>
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Date Submitted</TableHead>
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-right pr-8 py-5">Status & Action</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-8 py-5">Applicant</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Academic Info</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Barangay</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Date Submitted</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-right pr-8 py-5">Status & Action</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody className="bg-white">
@@ -617,11 +617,11 @@ export default function ApplicationsPage() {
                             <Table>
                               <TableHeader className="bg-slate-50/50">
                                 <TableRow className="border-slate-100 hover:bg-transparent">
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-8 py-5">Applicant</TableHead>
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Academic Info</TableHead>
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Barangay</TableHead>
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Archived Date</TableHead>
-                                  <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-right pr-8 py-5">Status & Action</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-8 py-5">Applicant</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Academic Info</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Barangay</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Archived Date</TableHead>
+                                  <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-right pr-8 py-5">Status & Action</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody className="bg-white">
@@ -830,7 +830,7 @@ export default function ApplicationsPage() {
                           disabled={isUpdating || selectedApp.status === 'rejected'}
                           className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 w-full sm:w-auto font-bold h-11 px-6"
                         >
-                          Resubmit
+                          Update & Resubmit
                         </Button>
                         )}
                         <Button 

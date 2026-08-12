@@ -488,11 +488,11 @@ export default function RegistrationApprovalPage() {
                   <Table>
                     <TableHeader className="bg-slate-50/50">
                       <TableRow className="border-slate-100">
-                        <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-8 py-4">Profile</TableHead>
-                        <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-4">Full Name</TableHead>
-                        <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-4">Email Address</TableHead>
-                        <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-4">Status</TableHead>
-                        <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-right pr-8 py-4">Actions</TableHead>
+                        <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-8 py-4">Profile</TableHead>
+                        <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Full Name</TableHead>
+                        <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Email Address</TableHead>
+                        <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Status</TableHead>
+                        <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-right pr-8 py-4">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody className="bg-white">

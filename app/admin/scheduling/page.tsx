@@ -15,7 +15,7 @@ import { PermissionGuard } from "@/components/permission-guard"
 import { DataPagination } from "@/components/data-pagination"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { 
-  CalendarDays, Plus, Loader2, Banknote, Clock, MapPin, StopCircle, UploadCloud, RotateCcw, ChevronDown, ChevronRight, Search, Archive, Users
+  CalendarDays, Plus, Loader2, Banknote, Clock, MapPin, StopCircle, UploadCloud, RotateCcw, ChevronDown, ChevronRight, Search, Archive, Users, Eye
 } from "lucide-react"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 
@@ -50,9 +50,9 @@ const formatTime = (time: string) => {
 
 const DateWindowDisplay = ({ start, end }: { start?: string, end?: string }) => (
   <div className="flex flex-col items-center justify-center text-center py-1">
-    <span className="text-[9px] font-black text-slate-400 tracking-widest uppercase">Start Date</span>
+    <span className="text-[11px] font-black text-gray-900 tracking-widest uppercase">Start Date</span>
     <span className="text-[11px] font-bold text-slate-700 whitespace-nowrap">{formatDate(start)}</span>
-    <span className="text-[9px] font-black text-slate-400 mt-1 tracking-widest uppercase">End Date</span>
+    <span className="text-[11px] font-black text-gray-900 mt-1 tracking-widest uppercase">End Date</span>
     <span className="text-[11px] font-bold text-slate-700 whitespace-nowrap">{formatDate(end)}</span>
   </div>
 );
@@ -75,6 +75,7 @@ export default function SchedulingPage() {
 
   const [isSubModalOpen, setIsSubModalOpen] = useState(false)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [barangayCoverageOpen, setBarangayCoverageOpen] = useState(false)
   
   const [barangaySelectionSearch, setBarangaySelectionSearch] = useState("")
 
@@ -488,26 +489,33 @@ export default function SchedulingPage() {
                     <Table>
                       <TableHeader className="bg-white">
                         <TableRow className="border-slate-100">
-                          <TableHead className="pl-6 font-black text-slate-400 uppercase text-[10px] tracking-widest py-4">Schedule</TableHead>
-                          <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Status</TableHead>
+                          <TableHead className="pl-6 font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Start Date</TableHead>
+                          <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-4">End Date</TableHead>
+                          <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Status</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody className="bg-white">
                         <TableRow className="hover:bg-slate-50 transition-colors border-slate-100">
                           <TableCell className="pl-6 py-4">
-                            <div className="flex flex-col items-start gap-1">
-                              <span className="text-[9px] font-black text-slate-400 tracking-widest uppercase">Start Date</span>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[11px] font-black text-gray-900 tracking-widest uppercase">Start Date</span>
                               <span className="text-sm font-bold text-slate-800">{formatDate(schedule.submissionStart)}</span>
-                              <span className="text-[9px] font-black text-slate-400 mt-1 tracking-widest uppercase">End Date</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-4">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[11px] font-black text-gray-900 tracking-widest uppercase">End Date</span>
                               <span className="text-sm font-bold text-slate-800">{formatDate(schedule.submissionEnd)}</span>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            {isSubmissionActive(schedule) ? (
-                                <Badge className="bg-emerald-50 text-emerald-700 border-none shadow-none font-bold px-3 py-1 uppercase tracking-widest text-[10px]">Active</Badge>
-                            ) : (
-                                <Badge className="bg-red-50 text-red-700 border-none shadow-none font-bold px-3 py-1 uppercase tracking-widest text-[10px]">Closed</Badge>
-                            )}
+                          <TableCell className="align-top py-4">
+                            <div className="pt-5">
+                              {isSubmissionActive(schedule) ? (
+                                  <Badge className="bg-emerald-50 text-emerald-700 border-none shadow-none font-bold px-3 py-1 uppercase tracking-widest text-[10px]">Active</Badge>
+                              ) : (
+                                  <Badge className="bg-red-50 text-red-700 border-none shadow-none font-bold px-3 py-1 uppercase tracking-widest text-[10px]">Closed</Badge>
+                              )}
+                            </div>
                           </TableCell>
                         </TableRow>
                       </TableBody>
@@ -556,33 +564,39 @@ export default function SchedulingPage() {
                     <div className="p-6 space-y-8">
                       {/* SECTION 1: PRIMARY DISTRIBUTION */}
                       <div className="space-y-4">
-                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                        <h3 className="text-sm font-black uppercase tracking-widest text-gray-900 flex items-center gap-2">
                           <CalendarDays className="h-4 w-4 text-emerald-500" /> Primary Distribution Schedule
                         </h3>
                         <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-sm overflow-x-auto">
                           <Table>
                             <TableHeader className="bg-slate-50/50">
                               <TableRow className="border-slate-200">
-                                <TableHead className="w-[35%] pl-6 font-black text-slate-400 uppercase text-[10px] tracking-widest py-4">Barangay(s)</TableHead>
-                                <TableHead className="w-[25%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Date Range</TableHead>
-                                <TableHead className="w-[15%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Time</TableHead>
-                                <TableHead className="w-[15%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Amount</TableHead>
-                                <TableHead className="w-[10%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Status</TableHead>
+                                <TableHead className="w-[35%] pl-6 font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Barangay(s)</TableHead>
+                                <TableHead className="w-[25%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Date Range</TableHead>
+                                <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Time</TableHead>
+                                <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Amount</TableHead>
+                                <TableHead className="w-[10%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Status</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody className="bg-white">
                                 <TableRow className="hover:bg-slate-50 transition-colors border-slate-100">
                                   <TableCell className="pl-6 py-4">
-                                    <div className="flex items-start gap-3">
-                                      <MapPin className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-                                      <div className="flex flex-col gap-2">
-                                        {schedule.targetBarangays?.map((b: string) => (
-                                          <Badge key={b} className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-black px-2.5 py-1 uppercase tracking-wider text-[10px] shadow-sm w-fit">
-                                            {b}
-                                          </Badge>
-                                        ))}
-                                        {(!schedule.targetBarangays || schedule.targetBarangays.length === 0) && (
-                                          <span className="text-sm font-medium text-slate-400 italic">Not specified</span>
+                                    <div className="flex items-center gap-3">
+                                      <MapPin className="h-5 w-5 text-emerald-500 shrink-0" />
+                                      <div className="flex flex-col gap-1">
+                                        <span className="text-sm font-black text-slate-800 whitespace-nowrap">
+                                          {schedule.targetBarangays?.length || 0} Barangay{(schedule.targetBarangays?.length || 0) === 1 ? "" : "s"}
+                                        </span>
+                                        {schedule.targetBarangays && schedule.targetBarangays.length > 0 ? (
+                                          <button
+                                            type="button"
+                                            onClick={() => setBarangayCoverageOpen(true)}
+                                            className="w-fit flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-800 underline decoration-emerald-300 underline-offset-2 transition-colors cursor-pointer"
+                                          >
+                                            <Eye className="h-3.5 w-3.5" /> View all {schedule.targetBarangays.length} barangay{(schedule.targetBarangays.length === 1 ? "" : "s")} →
+                                          </button>
+                                        ) : (
+                                          <span className="text-xs font-medium text-slate-400 italic">Not specified</span>
                                         )}
                                       </div>
                                     </div>
@@ -624,11 +638,11 @@ export default function SchedulingPage() {
                             <Table>
                               <TableHeader className="bg-purple-100/50">
                                 <TableRow className="border-purple-200/50">
-                                  <TableHead className="w-[35%] pl-6 font-black text-purple-400 uppercase text-[10px] tracking-widest py-4">Targeted</TableHead>
-                                  <TableHead className="w-[25%] font-black text-purple-400 uppercase text-[10px] tracking-widest text-center">Date Range</TableHead>
-                                  <TableHead className="w-[15%] font-black text-purple-400 uppercase text-[10px] tracking-widest text-center">Time</TableHead>
-                                  <TableHead className="w-[15%] font-black text-purple-400 uppercase text-[10px] tracking-widest text-center">Amount</TableHead>
-                                  <TableHead className="w-[10%] font-black text-purple-400 uppercase text-[10px] tracking-widest text-center">Status</TableHead>
+                                  <TableHead className="w-[35%] pl-6 font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Targeted</TableHead>
+                                  <TableHead className="w-[25%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Date Range</TableHead>
+                                  <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Time</TableHead>
+                                  <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Amount</TableHead>
+                                  <TableHead className="w-[10%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Status</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody className="bg-white">
@@ -669,6 +683,35 @@ export default function SchedulingPage() {
                           </div>
                         </div>
                       )}
+
+                        <Dialog open={barangayCoverageOpen} onOpenChange={setBarangayCoverageOpen}>
+                          <DialogContent className="sm:max-w-[600px] rounded-3xl p-6 shadow-2xl border-0 max-h-[85vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle className="text-xl font-black uppercase tracking-tight text-slate-800 flex items-center gap-2">
+                                <MapPin className="h-5 w-5 text-emerald-600" /> Barangay Coverage
+                              </DialogTitle>
+                              <DialogDescription className="font-bold text-slate-500">
+                                {schedule.targetBarangays?.length || 0} Barangay{(schedule.targetBarangays?.length || 0) === 1 ? "" : "s"} Included
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4">
+                              {schedule.targetBarangays && schedule.targetBarangays.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                                  {schedule.targetBarangays.map((b: string) => (
+                                    <Badge key={b} className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-black px-3 py-2 uppercase tracking-wider text-[11px] shadow-sm justify-start">
+                                      {b}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-sm font-medium text-slate-400 italic text-center py-8">No barangays specified for this schedule.</p>
+                              )}
+                            </div>
+                            <DialogFooter className="gap-2 sm:gap-0 mt-2">
+                              <Button variant="outline" onClick={() => setBarangayCoverageOpen(false)} className="rounded-xl font-bold border-slate-200 h-11 px-8">Close</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                     </div>
                   )}
                 </CardContent>
@@ -739,11 +782,11 @@ export default function SchedulingPage() {
                       <Table className="min-w-full">
                         <TableHeader className="bg-white">
                           <TableRow className="border-slate-100">
-                            <TableHead className="w-[30%] pl-6 font-black text-slate-400 uppercase text-[10px] tracking-widest py-4">Ended Date</TableHead>
-                            <TableHead className="w-[20%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Submission Window</TableHead>
-                            <TableHead className="w-[20%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Distribution Window</TableHead>
-                            <TableHead className="w-[15%] font-black text-slate-400 uppercase text-[10px] tracking-widest text-center">Amount Displayed</TableHead>
-                            <TableHead className="w-[15%] text-right pr-6 font-black text-slate-400 uppercase text-[10px] tracking-widest">Action</TableHead>
+                            <TableHead className="w-[30%] pl-6 font-bold text-gray-900 uppercase text-xs tracking-widest py-4">Ended Date</TableHead>
+                            <TableHead className="w-[20%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Submission Window</TableHead>
+                            <TableHead className="w-[20%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Distribution Window</TableHead>
+                            <TableHead className="w-[15%] font-bold text-gray-900 uppercase text-xs tracking-widest text-center">Amount Displayed</TableHead>
+                            <TableHead className="w-[15%] text-right pr-6 font-bold text-gray-900 uppercase text-xs tracking-widest">Action</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody className="bg-white">
@@ -821,9 +864,9 @@ export default function SchedulingPage() {
                                                   <CalendarDays className="h-4 w-4 text-purple-400 shrink-0" /> Extension
                                                 </h4>
                                                 <div className="flex flex-col items-center gap-1">
-                                                  <span className="text-[9px] font-black text-slate-400 tracking-widest uppercase">Start Date</span>
+                                                  <span className="text-[11px] font-black text-gray-900 tracking-widest uppercase">Start Date</span>
                                                   <p className="text-xs font-bold text-slate-700">{formatDate(hist.extensionStart)}</p>
-                                                  <span className="text-[9px] font-black text-slate-400 mt-1 tracking-widest uppercase">End Date</span>
+                                                  <span className="text-[11px] font-black text-gray-900 mt-1 tracking-widest uppercase">End Date</span>
                                                   <p className="text-xs font-bold text-slate-700">{formatDate(hist.extensionEnd)}</p>
                                                 </div>
                                               </div>

@@ -497,7 +497,7 @@ export default function StudentDocumentsPage() {
                  }`}
                >
                  {isSubmitting ? <Loader2 className="animate-spin mr-2 h-5 w-5" /> : null} 
-                 {isSubmitting ? "Submitting..." : (application?.status === 'rejected' ? "Resubmit Documents" : "Submit All Documents")}
+                 {isSubmitting ? "Submitting..." : (application?.status === 'rejected' ? "Update & Resubmit" : "Submit All Documents")}
                </Button>
              </div>
 

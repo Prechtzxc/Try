@@ -243,13 +243,13 @@ export function ApplicationsTable({ limit }: ApplicationsTableProps) {
         <Table>
           <TableHeader className="bg-slate-50/50">
             <TableRow className="border-slate-100">
-              <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-6">ID</TableHead>
-              <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Student</TableHead>
-              <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest">School & Course</TableHead>
-              <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Location</TableHead>
-              <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Date Applied</TableHead>
-              <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest">Status</TableHead>
-              <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-right pr-6">Actions</TableHead>
+              <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-6">ID</TableHead>
+              <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest">Student</TableHead>
+              <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest">School & Course</TableHead>
+              <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest">Location</TableHead>
+              <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest">Date Applied</TableHead>
+              <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest">Status</TableHead>
+              <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-right pr-6">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody className="bg-white">

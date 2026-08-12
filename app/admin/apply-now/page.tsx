@@ -178,7 +178,7 @@ export default function ApplyNowPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="rounded-2xl border-slate-200 shadow-sm bg-white">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-widest text-slate-400">Total Applications</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-gray-900">Total Applications</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black text-slate-800">{statusCounts.all}</div>
@@ -186,7 +186,7 @@ export default function ApplyNowPage() {
           </Card>
           <Card className="rounded-2xl border-amber-200 shadow-sm bg-amber-50/30">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-widest text-amber-600/70">Pending</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-amber-600/70">Pending</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black text-amber-600">{statusCounts.pending}</div>
@@ -194,7 +194,7 @@ export default function ApplyNowPage() {
           </Card>
           <Card className="rounded-2xl border-emerald-200 shadow-sm bg-emerald-50/30">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-widest text-emerald-600/70">Approved</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-emerald-600/70">Approved</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black text-emerald-600">{statusCounts.approved}</div>
@@ -202,7 +202,7 @@ export default function ApplyNowPage() {
           </Card>
           <Card className="rounded-2xl border-red-200 shadow-sm bg-red-50/30">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-black uppercase tracking-widest text-red-600/70">Rejected</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-red-600/70">Rejected</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black text-red-600">{statusCounts.rejected}</div>
@@ -265,11 +265,11 @@ export default function ApplyNowPage() {
                 <Table>
                   <TableHeader className="bg-slate-50/50">
                     <TableRow className="border-slate-100 hover:bg-transparent">
-                      <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-8 py-5">Applicant</TableHead>
-                      <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Attached Documents</TableHead>
-                      <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Status</TableHead>
-                      <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Submitted</TableHead>
-                      <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-right pr-8 py-5">Actions</TableHead>
+                      <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-8 py-5">Applicant</TableHead>
+                      <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Attached Documents</TableHead>
+                      <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Status</TableHead>
+                      <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Submitted</TableHead>
+                      <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-right pr-8 py-5">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody className="bg-white">

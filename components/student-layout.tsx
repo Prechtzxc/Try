@@ -300,7 +300,6 @@ export function StudentLayout({ children }: StudentLayoutProps) {
               <div className="flex-1 flex flex-col py-2 overflow-hidden">
                 <nav className="flex-1 flex flex-col px-4">
                   <div className="flex-1 overflow-y-auto pt-2">
-                    <p className="mb-3 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Main Navigation</p>
                     <div className="space-y-1">
                       {SEARCHABLE_PAGES.filter(item => item.name !== "Profile").map((item) => (
                         <Link
@@ -507,7 +506,6 @@ export function StudentLayout({ children }: StudentLayoutProps) {
         <aside className="hidden lg:flex w-64 flex-col border-r bg-white p-4 shrink-0">
           <nav className="flex-1 flex flex-col px-1 overflow-hidden">
             <div className="flex-1 overflow-y-auto pt-4">
-              <p className="mb-3 px-3 text-[10px] font-black uppercase tracking-widest text-slate-400">Main Navigation</p>
               <div className="space-y-1">
                 {SEARCHABLE_PAGES.filter(item => item.name !== "Profile").map((item) => (
                   <Link

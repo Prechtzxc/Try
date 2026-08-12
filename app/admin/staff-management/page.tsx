@@ -194,10 +194,10 @@ export default function StaffManagementPage() {
               <Table>
                 <TableHeader className="bg-white">
                   <TableRow className="border-slate-100">
-                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest pl-8 py-5">Staff Member</TableHead>
-                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Type</TableHead>
-                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest py-5">Permissions</TableHead>
-                    <TableHead className="font-black text-slate-400 uppercase text-[10px] tracking-widest text-right pr-8 py-5">Actions</TableHead>
+                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest pl-8 py-5">Staff Member</TableHead>
+                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Type</TableHead>
+                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest py-5">Permissions</TableHead>
+                    <TableHead className="font-bold text-gray-900 uppercase text-xs tracking-widest text-right pr-8 py-5">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody className="bg-white">

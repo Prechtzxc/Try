@@ -396,7 +396,7 @@ export default function StudentDashboard() {
                       isRejected ? 'text-red-600' :
                       (isSubmitted && !isApproved) ? 'text-amber-600' : 
                       isApproved ? 'text-emerald-600' : 'text-slate-400'
-                    }`}>{isRejected ? 'Resubmit' : 'Review'}</span>
+                    }`}>{isRejected ? 'Update & Resubmit' : 'Review'}</span>
                   </div>
                   <div className="flex flex-col items-center gap-2 z-10 w-16">
                     <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-black shadow-sm ${isApproved ? 'bg-emerald-500 text-white ring-4 ring-emerald-100' : 'bg-slate-100 text-slate-400'}`}>
