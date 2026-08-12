@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { DocumentPreviewModal } from "@/components/document-preview-modal"
-import { User, Mail, GraduationCap, FileText, Loader2 } from "lucide-react"
+import { User, Mail, GraduationCap, FileText, Loader2, History } from "lucide-react"
 import { doc, getDoc, getDocs, collection, query, where } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import type { Document } from "@/lib/storage"
@@ -33,11 +33,74 @@ function InfoItem({ label, value }: { label: string; value?: string | number | b
   )
 }
 
+interface AssistanceCycleEntry {
+  cycleId: string
+  label: string
+  status: "claimed" | "unclaimed"
+}
+
+// Archived applications and ended cycles are stamped at the same moment in the
+// "End Cycle" batch, so match them by closeness of archivedAt vs endedAt.
+const CYCLE_MATCH_WINDOW_MS = 24 * 60 * 60 * 1000
+
+const ASSISTANCE_PAGE_SIZE = 5
+
+function buildAssistanceHistory(historyRecords: any[], endedCycles: any[]): AssistanceCycleEntry[] {
+  const cycles = endedCycles
+    .filter((c) => c.endedAt)
+    .map((c) => ({ id: c.id, endedTime: new Date(c.endedAt).getTime(), label: `${new Date(c.endedAt).getFullYear()} Scholarship Cycle` }))
+    .sort((a, b) => a.endedTime - b.endedTime)
+
+  const approvedRecords = historyRecords.filter(
+    (r) => !r.isCancelled && (r.isApproved === true || r.status === "approved")
+  )
+
+  const grouped = new Map<string, { label: string; statuses: string[] }>()
+
+  for (const record of approvedRecords) {
+    const archivedAt = record.archivedAt || record.createdAt
+    let matched: { id: string; label: string } | null = null
+
+    if (archivedAt) {
+      const archivedTime = new Date(archivedAt).getTime()
+      let bestDiff = Infinity
+      for (const c of cycles) {
+        const diff = Math.abs(c.endedTime - archivedTime)
+        if (diff < bestDiff && diff <= CYCLE_MATCH_WINDOW_MS) {
+          bestDiff = diff
+          matched = { id: c.id, label: c.label }
+        }
+      }
+    }
+
+    if (!matched) {
+      const year = archivedAt ? new Date(archivedAt).getFullYear() : new Date().getFullYear()
+      matched = { id: record.id, label: `${year} Scholarship Cycle` }
+    }
+
+    if (!grouped.has(matched.id)) grouped.set(matched.id, { label: matched.label, statuses: [] })
+    grouped.get(matched.id)!.statuses.push(record.isClaimed ? "claimed" : "unclaimed")
+  }
+
+  const assistance: AssistanceCycleEntry[] = []
+  for (const [cycleId, group] of grouped) {
+    assistance.push({
+      cycleId,
+      label: group.label,
+      status: group.statuses.includes("claimed") ? "claimed" : "unclaimed",
+    })
+  }
+
+  return assistance
+}
+
 export function ScholarDetailsModal({ scholar, onOpenChange, open }: ScholarDetailsModalProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [userRecord, setUserRecord] = useState<any | null>(null)
   const [application, setApplication] = useState<any | null>(null)
   const [documents, setDocuments] = useState<Document[]>([])
+  const [assistanceCycles, setAssistanceCycles] = useState<AssistanceCycleEntry[]>([])
+  const [assistancePage, setAssistancePage] = useState(1)
   const [loadingDocs, setLoadingDocs] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [activeDocument, setActiveDocument] = useState<Document | null>(null)
@@ -52,12 +115,14 @@ export function ScholarDetailsModal({ scholar, onOpenChange, open }: ScholarDeta
       setIsLoading(true)
       setLoadingDocs(true)
       try {
-        const [userSnap, appResult, docsSnap] = await Promise.all([
+        const [userSnap, appResult, docsSnap, historySnap, cycleSnap] = await Promise.all([
           getDoc(doc(db, "users", studentId)),
           scholar.applicationId
             ? getDoc(doc(db, "applications", scholar.applicationId))
             : getDocs(query(collection(db, "applications"), where("studentId", "==", studentId))),
           getDocs(query(collection(db, "documents"), where("studentId", "==", studentId))),
+          getDocs(query(collection(db, "history"), where("studentId", "==", studentId))),
+          getDocs(collection(db, "schedule_history")),
         ])
 
         if (cancelled) return
@@ -89,6 +154,11 @@ export function ScholarDetailsModal({ scholar, onOpenChange, open }: ScholarDeta
         }
 
         setDocuments(relevantDocs)
+
+        const rawHistory = historySnap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        const endedCycles = cycleSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
+        setAssistanceCycles(buildAssistanceHistory(rawHistory, endedCycles))
+        setAssistancePage(1)
       } catch (error) {
         console.error("Failed to load scholar details:", error)
       } finally {
@@ -116,6 +186,16 @@ export function ScholarDetailsModal({ scholar, onOpenChange, open }: ScholarDeta
 
   const isCancelled = Boolean(scholar.isCancelled || app.isCancelled)
   const isClaimed = Boolean(scholar.isClaimed || app.isClaimed)
+
+  const claimedCount = assistanceCycles.filter((c) => c.status === "claimed").length
+  const unclaimedCount = assistanceCycles.filter((c) => c.status === "unclaimed").length
+
+  const assistanceTotalPages = Math.max(1, Math.ceil(assistanceCycles.length / ASSISTANCE_PAGE_SIZE))
+  const safeAssistancePage = Math.min(assistancePage, assistanceTotalPages)
+  const paginatedCycles = assistanceCycles.slice(
+    (safeAssistancePage - 1) * ASSISTANCE_PAGE_SIZE,
+    safeAssistancePage * ASSISTANCE_PAGE_SIZE
+  )
 
   const statusBadge = isCancelled
     ? { label: "Cancelled", className: "bg-red-500 text-white" }
@@ -201,6 +281,89 @@ export function ScholarDetailsModal({ scholar, onOpenChange, open }: ScholarDeta
                   </div>
                 </div>
               </section>
+
+              {/* Assistance History */}
+              {assistanceCycles.length > 0 && (
+                <section>
+                  <div className="mb-4 flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                      <History className="h-3.5 w-3.5" />
+                    </div>
+                    <h4 className="text-sm font-black uppercase tracking-tight text-slate-800">Assistance History</h4>
+                  </div>
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 md:p-6">
+                    <div className={`grid gap-3 sm:gap-4 ${claimedCount > 0 && unclaimedCount > 0 ? "grid-cols-2" : "grid-cols-1"}`}>
+                      {claimedCount > 0 && (
+                        <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-4 text-center">
+                          <p className="text-2xl md:text-3xl font-black text-emerald-600">{claimedCount}x</p>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-emerald-700 mt-1">Claimed</p>
+                        </div>
+                      )}
+                      {unclaimedCount > 0 && (
+                        <div className="rounded-xl bg-amber-50 border border-amber-100 p-4 text-center">
+                          <p className="text-2xl md:text-3xl font-black text-amber-600">{unclaimedCount}x</p>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-amber-700 mt-1">Unclaimed</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      {paginatedCycles.map((cycle) => (
+                        <div
+                          key={cycle.cycleId}
+                          className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 border border-slate-100 px-3.5 py-2.5"
+                        >
+                          <span className="text-xs font-bold text-slate-700">{cycle.label}</span>
+                          <span
+                            className={
+                              cycle.status === "claimed"
+                                ? "inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-emerald-700"
+                                : "inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-amber-700"
+                            }
+                          >
+                            {cycle.status === "claimed" ? "Claimed" : "Unclaimed"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    {assistanceTotalPages > 1 && (
+                      <div className="mt-4 flex items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          disabled={safeAssistancePage === 1}
+                          onClick={() => setAssistancePage((p) => Math.max(1, p - 1))}
+                          className="rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:bg-emerald-50 disabled:pointer-events-none disabled:opacity-40 transition-colors"
+                        >
+                          ‹ Previous
+                        </button>
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: assistanceTotalPages }, (_, i) => i + 1).map((n) => (
+                            <button
+                              key={n}
+                              type="button"
+                              onClick={() => setAssistancePage(n)}
+                              className={`flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 text-[10px] font-black transition-colors ${
+                                n === safeAssistancePage
+                                  ? "bg-emerald-600 text-white"
+                                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                              }`}
+                            >
+                              {n}
+                            </button>
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          disabled={safeAssistancePage === assistanceTotalPages}
+                          onClick={() => setAssistancePage((p) => Math.min(assistanceTotalPages, p + 1))}
+                          className="rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:bg-emerald-50 disabled:pointer-events-none disabled:opacity-40 transition-colors"
+                        >
+                          Next ›
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
             </div>
           )}
         </div>
