@@ -17,6 +17,16 @@ import {
   Clock, XCircle, Facebook, Activity, Calendar, AlertCircle, Info, Ban
 } from "lucide-react"
 
+const messageButtonColors: Record<string, string> = {
+  slate: "bg-slate-600 hover:bg-slate-700",
+  emerald: "bg-emerald-600 hover:bg-emerald-700",
+  purple: "bg-purple-600 hover:bg-purple-700",
+  amber: "bg-amber-600 hover:bg-amber-700",
+  blue: "bg-blue-600 hover:bg-blue-700",
+  red: "bg-red-600 hover:bg-red-700",
+  indigo: "bg-indigo-600 hover:bg-indigo-700",
+}
+
 function getTimelineSteps(application: any, schedule: any, studentBarangay: string) {
   const formatDate = (dateString?: string) => dateString ? new Date(dateString).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "";
 
@@ -321,7 +331,7 @@ export default function StudentDashboard() {
               </div>
             </div>
             
-            <Button asChild className={`bg-${messageData.color === 'slate' ? 'slate' : messageData.color}-600 hover:bg-${messageData.color === 'slate' ? 'slate' : messageData.color}-700 text-white rounded-xl font-black shadow-md h-12 px-8 w-full md:w-auto shrink-0 text-base md:text-lg transition-transform active:scale-95`}>
+            <Button asChild className={`${messageButtonColors[messageData.color] || "bg-emerald-600 hover:bg-emerald-700"} text-white rounded-xl font-black shadow-md h-12 px-8 w-full md:w-auto shrink-0 text-base md:text-lg transition-transform active:scale-95`}>
               <Link href={messageData.actionLink}>{messageData.actionText} <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
           </div>

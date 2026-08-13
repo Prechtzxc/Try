@@ -196,14 +196,14 @@ export default function StudentQRCodePage() {
 
         {/* QR Ticket Modal */}
         <Dialog open={showTicketModal} onOpenChange={setShowTicketModal}>
-          <DialogContent className="max-w-md rounded-3xl border-0 shadow-2xl p-0 overflow-hidden bg-transparent">
+          <DialogContent className="w-[calc(100vw-2rem)] sm:w-full max-w-md rounded-3xl border-0 shadow-2xl p-0 overflow-x-hidden overflow-y-auto bg-transparent max-h-[90dvh] overscroll-contain">
             <DialogClose className="absolute top-2 right-2 z-50 rounded-full h-8 w-8 bg-black/20 hover:bg-black/30 flex items-center justify-center transition-colors">
               <X className="h-4 w-4 text-white" />
             </DialogClose>
 
             {/* THE DIGITAL TICKET CARD */}
-            <Card className="border-0 shadow-2xl overflow-hidden max-w-md mx-auto bg-white rounded-3xl relative">
-              <div className="bg-emerald-600 p-6 text-center relative overflow-hidden">
+            <Card className="border-0 shadow-2xl overflow-hidden max-w-md w-full mx-auto bg-white rounded-3xl relative min-w-0">
+              <div className="bg-emerald-600 p-5 sm:p-6 text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-10 -mt-10" />
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-black opacity-10 rounded-full -ml-8 -mb-8" />
                 
@@ -218,7 +218,7 @@ export default function StudentQRCodePage() {
                 </p>
               </div>
               
-              <CardContent className="flex flex-col items-center justify-center p-8 bg-slate-50/50">
+              <CardContent className="flex flex-col items-center justify-center p-5 sm:p-8 bg-slate-50/50 min-w-0 w-full">
                 
                 {/* SCENARIO 1: CANCELLED */}
                 {isCancelled ? (
@@ -271,13 +271,13 @@ export default function StudentQRCodePage() {
                 
                 : isApproved ? (
                   <div className="text-center w-full animate-fade-in">
-                    <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 inline-block mb-6 relative group">
+                    <div className="bg-white p-4 sm:p-8 rounded-3xl shadow-sm border border-slate-200 inline-block mb-6 relative group max-w-full">
                       <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-emerald-500 rounded-tl-[1.5rem] -translate-x-1 -translate-y-1" />
                       <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-emerald-500 rounded-tr-[1.5rem] translate-x-1 -translate-y-1" />
                       <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-emerald-500 rounded-bl-[1.5rem] -translate-x-1 translate-y-1" />
                       <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-emerald-500 rounded-br-[1.5rem] translate-x-1 translate-y-1" />
                       
-                      <div className="bg-white rounded-xl">
+                      <div className="bg-white rounded-xl w-[220px] max-w-full">
                         <QRCode
                           id="QRCode"
                           value={qrValue}
@@ -285,7 +285,7 @@ export default function StudentQRCodePage() {
                           level="H"
                           bgColor="#ffffff"
                           fgColor="#000000"
-                          style={{ display: "block" }}
+                          style={{ display: "block", width: "100%", height: "auto" }}
                         />
                       </div>
                     </div>

@@ -16,6 +16,13 @@ import { ArrowLeft, ArrowRight, CheckCircle, User, School, Lock, Mail, Eye, EyeO
 
 import { doc, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import {
+  HOW_TO_APPLY_SETTINGS_DOC,
+  DEFAULT_IMPORTANT_NOTICE,
+  DEFAULT_REGISTRATION_NOTICE,
+  normalizeNotice,
+  type NoticeConfig,
+} from "@/lib/how-to-apply"
 
 // --- TYPES & CONSTANTS ---
 type FormData = {
@@ -88,6 +95,9 @@ export default function RegisterPage() {
   
   const [barangaysList, setBarangaysList] = useState<string[]>([]);
 
+  const [importantNotice, setImportantNotice] = useState<NoticeConfig>(DEFAULT_IMPORTANT_NOTICE);
+  const [registrationNotice, setRegistrationNotice] = useState<NoticeConfig>(DEFAULT_REGISTRATION_NOTICE);
+
   const [formData, setFormData] = useState<FormData>({
     email: "", studentPhoto: "", firstName: "", middleName: "", lastName: "",
     address: "", contactNumber: "", age: "", gender: "", otherGender: "",
@@ -110,6 +120,17 @@ export default function RegisterPage() {
       } else {
         setBarangaysList(["Barangay 1", "Barangay 2", "Barangay 3"]);
       }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const docRef = doc(db, "settings", HOW_TO_APPLY_SETTINGS_DOC);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      const data = docSnap.exists() ? docSnap.data() : {};
+      setImportantNotice(normalizeNotice(data?.importantNotice, DEFAULT_IMPORTANT_NOTICE));
+      setRegistrationNotice(normalizeNotice(data?.registrationNotice, DEFAULT_REGISTRATION_NOTICE));
     });
 
     return () => unsubscribe();
@@ -485,8 +506,14 @@ export default function RegisterPage() {
                           <div className="p-4 sm:p-5 bg-green-50 border border-green-200 rounded-xl shadow-sm">
                             <h4 className="flex items-center gap-2 text-sm font-bold text-green-800 mb-4">
                               <Info className="h-4 w-4 shrink-0" />
-                              Registration Notice
+                              {registrationNotice.title}
                             </h4>
+
+                            {registrationNotice.message && (
+                              <p className="text-xs font-medium text-green-700 leading-relaxed mb-4">
+                                {registrationNotice.message}
+                              </p>
+                            )}
 
                             {/* Vertical stepper with numbered circles + icons */}
                             <div className="space-y-0">
@@ -520,10 +547,10 @@ export default function RegisterPage() {
                             <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                               <div className="flex items-center gap-1.5 mb-1.5 text-amber-700">
                                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                                <h5 className="text-xs font-bold">Important Notice</h5>
+                                <h5 className="text-xs font-bold">{importantNotice.title}</h5>
                               </div>
                               <p className="text-[11px] text-amber-800 leading-relaxed">
-                                Only students included in the Registration Approval List may proceed with account registration. For more information, kindly proceed to the CAYDO Office.
+                                {importantNotice.message}
                               </p>
                             </div>
 

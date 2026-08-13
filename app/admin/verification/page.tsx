@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -107,6 +107,9 @@ export default function QRVerificationPage() {
   const [studentId, setStudentId] = useState("")
   const [isScanning, setIsScanning] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+
+  const lastScannedValueRef = useRef<{ value: string; timestamp: number } | null>(null)
+  const DUPLICATE_SCAN_WINDOW_MS = 2000
   
   const [activeUserId, setActiveUserId] = useState<string | null>(null)
   const [isClaimed, setIsClaimed] = useState(false)
@@ -383,6 +386,12 @@ export default function QRVerificationPage() {
   }
 
   const handleQRCodeResult = async (result: string) => {
+    const now = Date.now()
+    if (lastScannedValueRef.current?.value === result && now - lastScannedValueRef.current.timestamp < DUPLICATE_SCAN_WINDOW_MS) {
+      return
+    }
+    lastScannedValueRef.current = { value: result, timestamp: now }
+
     try {
       let studentIdFromQR: string
 
@@ -391,7 +400,6 @@ export default function QRVerificationPage() {
         
         if (/^[a-f0-9]{64}$/i.test(qrValue)) {
           setStudentId(qrValue)
-          setIsScanning(false)
           await resolveStudentByHash(qrValue)
           return
         }
@@ -413,7 +421,6 @@ export default function QRVerificationPage() {
       }
 
       setStudentId(studentIdFromQR)
-      setIsScanning(false)
       resolveStudentInFirestore(studentIdFromQR)
       
     } catch (error) {
@@ -421,6 +428,53 @@ export default function QRVerificationPage() {
       toast({ variant: "destructive", title: "Invalid QR code", description: "Could not read QR data" })
     }
   }
+
+  const handleQRCodeResultRef = useRef(handleQRCodeResult)
+
+  useEffect(() => {
+    handleQRCodeResultRef.current = handleQRCodeResult
+  })
+
+  useEffect(() => {
+    if (!isScanning) return
+
+    let wedgeBuffer = ""
+    let wedgeTimer: ReturnType<typeof setTimeout> | null = null
+
+    const submitWedgeBuffer = () => {
+      const value = wedgeBuffer.trim()
+      wedgeBuffer = ""
+      if (wedgeTimer) {
+        clearTimeout(wedgeTimer)
+        wedgeTimer = null
+      }
+      if (value) {
+        handleQRCodeResultRef.current(value)
+      }
+    }
+
+    const handleWedgeKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT" || target.isContentEditable)) {
+        return
+      }
+      if (e.key === "Enter") {
+        submitWedgeBuffer()
+        return
+      }
+      if (e.key.length === 1) {
+        wedgeBuffer += e.key
+        if (wedgeTimer) clearTimeout(wedgeTimer)
+        wedgeTimer = setTimeout(submitWedgeBuffer, 150)
+      }
+    }
+
+    window.addEventListener("keydown", handleWedgeKeyDown)
+    return () => {
+      window.removeEventListener("keydown", handleWedgeKeyDown)
+      if (wedgeTimer) clearTimeout(wedgeTimer)
+    }
+  }, [isScanning])
 
   const resolveStudentByHash = async (hashedId: string) => {
     setIsProcessing(true)

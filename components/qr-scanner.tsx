@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Maximize, Minimize } from "lucide-react"
 
+const SCAN_COOLDOWN_MS = 3000
+
 interface QrScannerProps {
   onResult: (result: string) => void
 }
@@ -18,6 +20,7 @@ export function QrScanner({ onResult }: QrScannerProps) {
   const scannerRef = useRef<Html5Qrcode | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const scannerContainerRef = useRef<HTMLDivElement | null>(null)
+  const lastScanRef = useRef<{ value: string; timestamp: number } | null>(null)
   
   const onResultRef = useRef(onResult)
 
@@ -86,9 +89,11 @@ export function QrScanner({ onResult }: QrScannerProps) {
 
       const onSuccess = (decodedText: string) => {
         console.log("[v0] QR Scanner SUCCESS - Decoded:", decodedText)
-        if (scannerRef.current) {
-          scannerRef.current.pause(true)
+        const now = Date.now()
+        if (lastScanRef.current?.value === decodedText && now - lastScanRef.current.timestamp < SCAN_COOLDOWN_MS) {
+          return
         }
+        lastScanRef.current = { value: decodedText, timestamp: now }
         onResultRef.current(decodedText)
       }
 
