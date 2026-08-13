@@ -25,6 +25,7 @@ import {
 
 import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { PdfViewer } from "@/components/pdf-viewer"
 
 type DocumentStatus = {
   isUploading: boolean
@@ -376,8 +377,8 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
                         >
                           <CheckCircle className={`h-4 w-4 shrink-0 group-hover:text-emerald-500 ${isLocked ? 'text-emerald-500' : 'text-green-600'}`} />
                           <div className="min-w-0">
-                            <p className="text-sm font-medium whitespace-nowrap group-hover:underline decoration-dashed underline-offset-4">{docStatus.fileName}</p>
-                            <p className="text-xs text-muted-foreground font-medium flex gap-1 whitespace-nowrap">
+                            <p className="text-sm font-medium break-words [overflow-wrap:anywhere] leading-snug group-hover:underline decoration-dashed underline-offset-4">{docStatus.fileName}</p>
+                            <p className="text-xs text-muted-foreground font-medium flex gap-1 flex-wrap">
                               {docStatus.fileSize} <span className="text-[10px] uppercase font-bold text-emerald-600/70 group-hover:text-emerald-600 transition-colors">• View Document</span>
                             </p>
                           </div>
@@ -423,7 +424,7 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
         <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 rounded-3xl overflow-hidden flex flex-col border-0 shadow-2xl bg-slate-900 z-[100] [&>button]:hidden">
           <DialogHeader className="p-4 bg-white shrink-0 flex flex-row items-center justify-between border-b border-slate-200">
             <div className="flex-1 min-w-0 pr-4 text-left">
-              <DialogTitle className="text-lg font-black uppercase tracking-tight text-slate-800 whitespace-nowrap">{previewDoc?.fileName}</DialogTitle>
+              <DialogTitle className="text-lg font-black uppercase tracking-tight text-slate-800 min-w-0 break-words [overflow-wrap:anywhere] leading-snug">{previewDoc?.fileName}</DialogTitle>
               <DialogDescription className="text-xs font-bold uppercase tracking-widest mt-1 text-slate-500">
                 {previewDoc?.fileSize} {(previewDoc?.status === 'approved' || applicationStatus === 'approved') && "• APPROVED DOCUMENT"}
               </DialogDescription>
@@ -442,23 +443,22 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
                 <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 rounded-full h-8 w-8" onClick={() => setZoom(z => Math.min(z + 0.25, 3))}><ZoomIn className="w-4 h-4" /></Button>
               </div>
             )}
-            <div 
-              className={`flex-1 overflow-hidden flex items-center justify-center ${!isPdf ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
-              onMouseDown={!isPdf ? handleMouseDown : undefined} onMouseMove={!isPdf ? handleMouseMove : undefined}
-              onMouseUp={!isPdf ? handleMouseUp : undefined} onMouseLeave={!isPdf ? handleMouseUp : undefined}
-            >
-              {isPdf ? (
-                // 🔥 TEMP DEBUG: log the EXACT URL the iframe renders + flag deprecated image path
-                (console.log("[Preview] [PDF] iframe src:", `${previewDoc.url}#toolbar=1&navpanes=0&view=FitH`),
-                <iframe src={`${previewDoc.url}#toolbar=1&navpanes=0&view=FitH`} className="w-full h-full bg-white shadow-2xl" title={previewDoc.fileName} />)
-              ) : (
-                (console.log("[Preview] [IMAGE] img src:", previewDoc?.url),
+            {isPdf ? (
+              <div className="flex-1 min-h-0 w-full">
+                <PdfViewer url={previewDoc?.url || ""} fileName={previewDoc?.fileName} />
+              </div>
+            ) : (
+              <div 
+                className={`flex-1 overflow-hidden flex items-center justify-center ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                onMouseDown={handleMouseDown} onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}
+              >
                 <img src={previewDoc?.url} alt={previewDoc?.fileName} draggable={false}
                   style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`, transition: isDragging ? 'none' : 'transform 0.1s ease-out' }}
                   className="max-h-[90vh] w-auto object-contain drop-shadow-2xl rounded-md pointer-events-none select-none"
-                />)
-              )}
-            </div>
+                />
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

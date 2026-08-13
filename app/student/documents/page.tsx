@@ -24,6 +24,7 @@ import {
 import { collection, query, where, onSnapshot, doc, deleteDoc, addDoc, updateDoc, orderBy } from "firebase/firestore"
 import { db } from "@/lib/firebase" 
 import { createDocumentDb, createApplicationDb, notifyAdminsDb, isSubmissionActive } from "@/lib/storage"
+import { PdfViewer } from "@/components/pdf-viewer"
 
 export default function StudentDocumentsPage() {
   const { user } = useAuth()
@@ -545,22 +546,21 @@ export default function StudentDocumentsPage() {
 
         <Dialog open={!!viewingDoc} onOpenChange={(open) => !open && setViewingDoc(null)}>
           <DialogContent aria-describedby={undefined} className="max-w-5xl w-[95vw] h-[90vh] p-0 flex flex-col overflow-hidden bg-slate-900 border-none rounded-3xl shadow-2xl [&>button]:hidden z-[100]">
-            <DialogHeader className="p-4 bg-white border-b border-slate-200 flex flex-row items-center justify-between shrink-0">
-              <DialogTitle className="text-lg font-black uppercase text-emerald-900 whitespace-nowrap pr-4">
+            <DialogHeader className="p-4 bg-white border-b border-slate-200 flex flex-row items-center justify-between gap-3 shrink-0">
+              <DialogTitle className="text-lg font-black uppercase text-emerald-900 min-w-0 flex-1 leading-snug break-words [overflow-wrap:anywhere]">
                 {viewingDoc?.name}
               </DialogTitle>
               <DialogClose className="rounded-full h-10 w-10 flex items-center justify-center hover:bg-slate-100 transition-colors shrink-0">
                 <X className="h-5 w-5 text-slate-500" />
               </DialogClose>
             </DialogHeader>
-            <div className="flex-1 w-full bg-slate-900 flex items-center justify-center overflow-hidden">
+            <div className="flex-1 w-full min-h-0 bg-slate-900 flex flex-col overflow-hidden">
               {viewingDoc?.isPdf ? (
-                // 🔥 TEMP DEBUG: log the EXACT URL the iframe renders
-                (console.log("[Preview] [PDF] iframe src:", `${viewingDoc.url}#toolbar=0`),
-                <iframe src={`${viewingDoc.url}#toolbar=0`} className="w-full h-full border-none bg-white" title="Document Preview" />)
+                <PdfViewer url={viewingDoc.url} fileName={viewingDoc.name} />
               ) : (
-                (console.log("[Preview] [IMAGE] img src:", viewingDoc?.url),
-                <img src={viewingDoc?.url} alt="Document Preview" className="w-full h-full object-contain bg-slate-900" />)
+                <div className="flex-1 w-full h-full flex items-center justify-center">
+                  <img src={viewingDoc?.url} alt="Document Preview" className="max-w-full max-h-full object-contain bg-slate-900" />
+                </div>
               )}
             </div>
           </DialogContent>

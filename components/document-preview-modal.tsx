@@ -14,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { FileText, Loader2, ExternalLink } from "lucide-react"
 import type { Document } from "@/lib/storage"
 import { resolveRequirementLabel } from "@/lib/requirements-config"
+import { PdfViewer } from "@/components/pdf-viewer"
 
 interface DocumentPreviewModalProps {
   open: boolean
@@ -52,8 +53,8 @@ const isPdfDocument = (doc: Document | null | undefined): boolean => {
 
 // Cloudinary PDFs uploaded via `/raw/upload/` are delivered with
 // Content-Disposition: attachment, which forces the browser to download instead
-// of rendering inline. Rewriting to the image resource type lets the browser
-// render the PDF inside the iframe.
+// of rendering inline. Used only for the "Open in New Tab" fallback; the in-app
+// viewer always fetches the original PDF URL and renders it with PDF.js.
 const normalizePdfUrl = (url?: string): string => {
   if (!url) return ""
   return url.replace(/\/(raw|auto|image)\/upload\//, "/image/upload/")
@@ -73,7 +74,7 @@ export function DocumentPreviewModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent overlayClassName="z-[200]" className={`max-w-6xl w-[95vw] h-[90vh] flex flex-col p-0 overflow-hidden bg-slate-50 border-none shadow-2xl rounded-3xl z-[210] ${contentClassName || ""}`}>
         <DialogHeader className="px-6 py-4 border-b border-slate-200 bg-white shrink-0">
-          <DialogTitle className="text-xl font-black uppercase text-slate-800 tracking-tight">
+          <DialogTitle className="text-xl font-black uppercase text-slate-800 tracking-tight break-words [overflow-wrap:anywhere] leading-snug">
             Documents for {studentName || "Student"}
           </DialogTitle>
           <DialogDescription className="font-medium text-slate-500">Select a document from the sidebar to view it.</DialogDescription>
@@ -101,10 +102,10 @@ export function DocumentPreviewModal({
                       }`}
                     >
                       <div className="flex items-start justify-between w-full">
-                        <span className="font-bold text-xs text-slate-800 pr-2 leading-tight uppercase">{resolveRequirementLabel(doc)}</span>
+                        <span className="font-bold text-xs text-slate-800 pr-2 leading-tight uppercase min-w-0 break-words [overflow-wrap:anywhere]">{resolveRequirementLabel(doc)}</span>
                       </div>
                       <div className="flex items-center justify-between w-full text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 gap-2">
-                        <span className="truncate">{doc.name}</span>
+                        <span className="min-w-0 break-words [overflow-wrap:anywhere] leading-snug">{doc.name}</span>
                         <Badge variant="outline" className={`text-[9px] shadow-none shrink-0 ${isPdfDocument(doc) ? 'bg-red-50 text-red-600 border-red-200' : 'bg-blue-50 text-blue-600 border-blue-200'}`}>{isPdfDocument(doc) ? 'pdf' : 'image'}</Badge>
                       </div>
                     </button>
@@ -118,9 +119,9 @@ export function DocumentPreviewModal({
             {activeDocument ? (
               <div className="flex-1 flex flex-col w-full h-full">
                 <div className="h-14 border-b border-white/10 bg-slate-800/90 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-10 absolute top-0 w-full gap-3">
-                  <span className="font-bold text-xs uppercase tracking-widest text-white flex items-center gap-2 min-w-0">
+                  <span className="font-bold text-xs uppercase tracking-widest text-white flex items-center gap-2 min-w-0 leading-snug">
                     <FileText className="h-4 w-4 text-emerald-400 shrink-0"/>
-                    <span className="truncate">{resolveRequirementLabel(activeDocument)}</span>
+                    <span className="min-w-0 break-words [overflow-wrap:anywhere]">{resolveRequirementLabel(activeDocument)}</span>
                   </span>
                   <Button 
                     size="sm" 
@@ -132,13 +133,9 @@ export function DocumentPreviewModal({
                   </Button>
                 </div>
 
-                <div className="flex-1 overflow-hidden flex items-center justify-center pt-14">
+                <div className="flex-1 min-h-0 overflow-hidden pt-14">
                   {isPdfDocument(activeDocument) ? (
-                    <iframe
-                      src={`${normalizePdfUrl(activeDocument.url)}#toolbar=1&navpanes=0&view=FitH`}
-                      title={activeDocument.name}
-                      className="w-full h-full border-0"
-                    />
+                    <PdfViewer url={activeDocument.url || ""} fileName={activeDocument.name} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center p-4">
                       <img src={activeDocument.url || ""} alt={activeDocument.name} className="max-w-full max-h-full object-contain rounded-md drop-shadow-2xl select-none" draggable={false} />

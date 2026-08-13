@@ -22,6 +22,7 @@ import {
 
 import { collection, query, where, onSnapshot, doc, updateDoc, addDoc } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { PdfViewer } from "@/components/pdf-viewer"
 
 const REQUIRED_DOCS = [
   "Filled-out Application Form",
@@ -888,9 +889,9 @@ export default function ApplicationsPage() {
                              disabled={!isUploaded}
                              className="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-500 shrink-0"
                            />
-                           <span className="text-xs font-medium text-slate-700 truncate" title={docName}>
-                             {docName}
-                           </span>
+                            <span className="text-xs font-medium text-slate-700 min-w-0 break-words [overflow-wrap:anywhere] leading-snug" title={docName}>
+                              {docName}
+                            </span>
                            {isUploaded ? (
                              <CheckCircle className="h-3 w-3 text-emerald-500 shrink-0" />
                            ) : (
@@ -941,7 +942,7 @@ export default function ApplicationsPage() {
             <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 rounded-3xl overflow-hidden flex flex-col border-0 shadow-2xl bg-slate-900 z-[100] [&>button]:hidden">
               <DialogHeader className="p-4 bg-white shrink-0 flex flex-row items-center justify-between border-b border-slate-200">
                 <div className="flex-1 min-w-0 pr-4">
-                  <DialogTitle className="text-lg font-black uppercase tracking-tight text-slate-800 whitespace-nowrap">
+                  <DialogTitle className="text-lg font-black uppercase tracking-tight text-slate-800 min-w-0 break-words [overflow-wrap:anywhere] leading-snug">
                     {previewDoc?.name}
                   </DialogTitle>
                   <DialogDescription className="text-xs font-bold uppercase tracking-widest mt-1 text-slate-500">
@@ -992,23 +993,18 @@ export default function ApplicationsPage() {
                     </Button>
                   </div>
                 )}
-                <div 
-                  className={`flex-1 overflow-hidden flex items-center justify-center ${!isPdf ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
-                  onMouseDown={!isPdf ? handleMouseDown : undefined}
-                  onMouseMove={!isPdf ? handleMouseMove : undefined}
-                  onMouseUp={!isPdf ? handleMouseUp : undefined}
-                  onMouseLeave={!isPdf ? handleMouseUp : undefined}
-                >
-                  {isPdf ? (
-                    // 🔥 TEMP DEBUG: log the EXACT URL the iframe renders
-                    (console.log("[Preview] [PDF] iframe src:", `${previewDoc?.url}#toolbar=1&navpanes=0&view=FitH`),
-                    <iframe 
-                      src={`${previewDoc?.url}#toolbar=1&navpanes=0&view=FitH`} 
-                      className="w-full h-full bg-white shadow-2xl"
-                      title={previewDoc?.name || "Document Preview"}
-                    />)
-                  ) : (
-                    (console.log("[Preview] [IMAGE] img src:", previewDoc?.url),
+                {isPdf ? (
+                  <div className="flex-1 min-h-0 w-full">
+                    <PdfViewer url={previewDoc?.url || ""} fileName={previewDoc?.name} />
+                  </div>
+                ) : (
+                  <div 
+                    className={`flex-1 overflow-hidden flex items-center justify-center ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                  >
                     <img 
                       src={previewDoc?.url} 
                       alt={previewDoc?.name} 
@@ -1018,9 +1014,9 @@ export default function ApplicationsPage() {
                         transition: isDragging ? 'none' : 'transform 0.1s ease-out'
                       }}
                       className="max-h-[90vh] w-auto object-contain drop-shadow-2xl rounded-md pointer-events-none select-none"
-                    />)
-                  )}
-                </div>
+                    />
+                  </div>
+                )}
               </div>
             </DialogContent>
           </Dialog>
