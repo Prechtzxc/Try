@@ -286,7 +286,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="flex h-screen flex-col bg-slate-50/50 overflow-hidden text-left">
-      <header className="shrink-0 z-50 bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 text-white shadow-lg h-16 flex items-center justify-between px-6">
+      <header className="shrink-0 z-50 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white shadow-lg h-16 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild className="lg:hidden">
@@ -386,7 +386,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             />
 
             {isSearchFocused && searchQuery.trim() !== "" && (
-              <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[100]">
+              <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-slate-200 overflow-hidden animate-in fade-in zoom-in-95">
                 {filteredSearchPages.length > 0 ? (
                   filteredSearchPages.map(page => (
                     <button
@@ -420,7 +420,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 <Button variant="ghost" size="icon" className="relative rounded-full text-white hover:bg-white/10">
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center border-2 border-emerald-600 shadow-sm">
+                    <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center border-2 border-yellow-500 shadow-md">
                       {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                   )}
@@ -465,7 +465,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                             <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed font-medium">{n.message}</p>
                           </div>
 
-                          <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/80 p-1 rounded-full shadow-sm border border-slate-100 backdrop-blur-sm">
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/80 p-1 rounded-full shadow-sm">
                             {isUnread ? (
                               <button 
                                 onClick={(e) => handleMarkAsReadInline(e, n.id)}
