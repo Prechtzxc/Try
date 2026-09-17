@@ -484,7 +484,7 @@ function AddStaffDialog({
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {ALL_PERMISSIONS.map((key) => (
+              {ALL_PERMISSIONS.filter((key) => Boolean(PERMISSION_LABELS[key])).map((key) => (
                 <label
                   key={key}
                   className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-all duration-150 select-none ${
