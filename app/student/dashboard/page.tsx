@@ -496,7 +496,7 @@ export default function StudentDashboard() {
           <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
             <div className="flex justify-between items-center">
               <div>
-                <CardTitle className="text-xl font-black uppercase tracking-tight text-slate-800">Application Timeline</CardTitle>
+                <CardTitle className="text-xl font-black uppercase tracking-tight text-slate-800">Monitor Your Application</CardTitle>
                 <CardDescription className="font-medium text-slate-500">Track your progress from submission to financial distribution.</CardDescription>
               </div>
               <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center border border-slate-200 shadow-sm">
