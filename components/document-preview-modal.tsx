@@ -116,7 +116,7 @@ export function DocumentPreviewModal({
 
                 <div className="flex-1 min-h-0 overflow-hidden pt-14">
                   {isPdfDocument(activeDocument) ? (
-                    <PdfViewer url={activeDocument.url || ""} fileName={activeDocument.name} />
+                    <PdfViewer url={normalizePdfUrl(activeDocument.url)} fileName={activeDocument.name} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center p-4">
                       <img src={activeDocument.url || ""} alt={activeDocument.name} className="max-w-full max-h-full object-contain rounded-md drop-shadow-2xl select-none" draggable={false} />
