@@ -15,6 +15,7 @@ import { FileText, Loader2, ExternalLink } from "lucide-react"
 import type { Document } from "@/lib/storage"
 import { resolveRequirementLabel } from "@/lib/requirements-config"
 import { PdfViewer } from "@/components/pdf-viewer"
+import { normalizePdfUrl, openDocumentInNewTab } from "@/lib/file-utils"
 
 interface DocumentPreviewModalProps {
   open: boolean
@@ -27,15 +28,6 @@ interface DocumentPreviewModalProps {
   contentClassName?: string
 }
 
-// Opens the document in a new tab. Must stay synchronous: an async handler
-// would call window.open() after an await, i.e. outside the user-gesture call
-// stack, which browsers silently block (popup blocker) and makes the button
-// appear dead.
-const openDocumentInNewTab = (url: string) => {
-  if (!url) return
-  window.open(url, "_blank", "noopener,noreferrer")
-}
-
 // Detects a PDF regardless of how the `type` was stored at upload time:
 // - document-upload.tsx stores `"pdf"`
 // - app/student/documents/page.tsx stores the raw MIME like `"application/pdf"`
@@ -46,15 +38,6 @@ const isPdfDocument = (doc: Document | null | undefined): boolean => {
   const url = (doc.url || "").toLowerCase()
   const name = (doc.name || "").toLowerCase()
   return type.includes("pdf") || url.endsWith(".pdf") || name.endsWith(".pdf")
-}
-
-// Cloudinary PDFs uploaded via `/raw/upload/` are delivered with
-// Content-Disposition: attachment, which forces the browser to download instead
-// of rendering inline. Used only for the "Open in New Tab" fallback; the in-app
-// viewer always fetches the original PDF URL and renders it with PDF.js.
-const normalizePdfUrl = (url?: string): string => {
-  if (!url) return ""
-  return url.replace(/\/(raw|auto|image)\/upload\//, "/image/upload/")
 }
 
 export function DocumentPreviewModal({
@@ -125,7 +108,7 @@ export function DocumentPreviewModal({
                     size="sm" 
                     variant="ghost" 
                     className="text-white hover:bg-white/20 rounded-xl text-xs font-bold shrink-0 relative z-10 pointer-events-auto cursor-pointer"
-                    onClick={() => openDocumentInNewTab(isPdfDocument(activeDocument) ? normalizePdfUrl(activeDocument.url) : activeDocument.url || "")}
+                    onClick={() => openDocumentInNewTab(activeDocument.url, isPdfDocument(activeDocument))}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" /> Open in New Tab
                   </Button>

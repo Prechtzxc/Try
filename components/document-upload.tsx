@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/contexts/auth-context"
+import { openDocumentInNewTab } from "@/lib/file-utils"
 import { 
   createDocumentDb, 
   deleteDocumentDb, 
@@ -430,7 +431,7 @@ export function DocumentUpload({ onUploadComplete }: DocumentUploadProps) {
               </DialogDescription>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <Button variant="outline" size="sm" onClick={() => window.open(previewDoc?.url, '_blank')} className="font-bold text-xs rounded-xl hidden sm:flex"><ExternalLink className="w-4 h-4 mr-2" /> Open in New Tab</Button>
+              <Button variant="outline" size="sm" type="button" onClick={() => openDocumentInNewTab(previewDoc?.url, isPdf)} className="font-bold text-xs rounded-xl hidden sm:flex cursor-pointer pointer-events-auto relative z-10"><ExternalLink className="w-4 h-4 mr-2" /> Open in New Tab</Button>
               <Button variant="ghost" size="icon" onClick={() => setPreviewDoc(null)} className="rounded-xl text-slate-500 hover:bg-red-50 hover:text-red-600"><X className="w-5 h-5" /></Button>
             </div>
           </DialogHeader>

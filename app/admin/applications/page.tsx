@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { openDocumentInNewTab } from "@/lib/file-utils"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -796,7 +797,7 @@ export default function ApplicationsPage() {
                                   <Eye className="w-3 h-3 mr-1.5" /> View
                                 </Button>
                                 <div className="w-px bg-slate-100 my-1" />
-                                <Button variant="ghost" className="flex-1 h-8 text-[10px] font-bold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg" onClick={() => window.open(uploadedDoc.url, '_blank')}>
+                                <Button variant="ghost" type="button" className="flex-1 h-8 text-[10px] font-bold text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer pointer-events-auto" onClick={() => openDocumentInNewTab(uploadedDoc.url, uploadedDoc.url?.toLowerCase().endsWith('.pdf'))}>
                                   <ExternalLink className="w-3 h-3 mr-1.5" /> New Tab
                                 </Button>
                               </div>
@@ -953,8 +954,9 @@ export default function ApplicationsPage() {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => window.open(previewDoc?.url, '_blank')} 
-                    className="font-bold text-xs rounded-xl hidden sm:flex border-slate-200 text-slate-700 hover:bg-slate-50"
+                    type="button" 
+                    onClick={() => openDocumentInNewTab(previewDoc?.url, isPdf)} 
+                    className="font-bold text-xs rounded-xl hidden sm:flex border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer pointer-events-auto relative z-10"
                   >
                     <ExternalLink className="w-4 h-4 mr-2" /> Open in New Tab
                   </Button>
