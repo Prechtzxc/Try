@@ -27,16 +27,13 @@ interface DocumentPreviewModalProps {
   contentClassName?: string
 }
 
-const openBase64InNewTab = async (base64Data: string) => {
-  try {
-    const response = await fetch(base64Data)
-    const blob = await response.blob()
-    const blobUrl = URL.createObjectURL(blob)
-    window.open(blobUrl, "_blank")
-  } catch (error) {
-    console.error("Failed to open document", error)
-    window.open(base64Data, "_blank")
-  }
+// Opens the document in a new tab. Must stay synchronous: an async handler
+// would call window.open() after an await, i.e. outside the user-gesture call
+// stack, which browsers silently block (popup blocker) and makes the button
+// appear dead.
+const openDocumentInNewTab = (url: string) => {
+  if (!url) return
+  window.open(url, "_blank", "noopener,noreferrer")
 }
 
 // Detects a PDF regardless of how the `type` was stored at upload time:
@@ -118,16 +115,17 @@ export function DocumentPreviewModal({
           <div className="flex-1 bg-slate-900 flex flex-col relative overflow-hidden min-h-[40vh] md:min-h-0">
             {activeDocument ? (
               <div className="flex-1 flex flex-col w-full h-full">
-                <div className="h-14 border-b border-white/10 bg-slate-800/90 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-10 absolute top-0 w-full gap-3">
+                <div className="h-14 border-b border-white/10 bg-slate-800/90 backdrop-blur-md flex items-center justify-between px-4 md:px-6 shrink-0 shadow-sm z-10 absolute top-0 left-0 w-full gap-3">
                   <span className="font-bold text-xs uppercase tracking-widest text-white flex items-center gap-2 min-w-0 leading-snug">
                     <FileText className="h-4 w-4 text-emerald-400 shrink-0"/>
                     <span className="min-w-0 break-words [overflow-wrap:anywhere]">{resolveRequirementLabel(activeDocument)}</span>
                   </span>
                   <Button 
+                    type="button"
                     size="sm" 
                     variant="ghost" 
-                    className="text-white hover:bg-white/20 rounded-xl text-xs font-bold shrink-0"
-                    onClick={() => openBase64InNewTab(isPdfDocument(activeDocument) ? normalizePdfUrl(activeDocument.url) : activeDocument.url || "")}
+                    className="text-white hover:bg-white/20 rounded-xl text-xs font-bold shrink-0 relative z-10 pointer-events-auto cursor-pointer"
+                    onClick={() => openDocumentInNewTab(isPdfDocument(activeDocument) ? normalizePdfUrl(activeDocument.url) : activeDocument.url || "")}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" /> Open in New Tab
                   </Button>
