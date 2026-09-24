@@ -286,7 +286,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="flex h-screen flex-col bg-slate-50/50 overflow-hidden text-left">
-      <header className="shrink-0 z-50 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white shadow-lg h-16 flex items-center justify-between px-6">
+      <header className="shrink-0 z-50 bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 text-white shadow-lg h-16 flex items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild className="lg:hidden">
