@@ -506,7 +506,7 @@ export default function StudentDashboard() {
           </CardHeader>
           <CardContent className="pt-8 px-8 pb-4">
             <div className="relative pl-6 border-l-2 border-slate-200 ml-3">
-              {getTimelineSteps(currentApp, schedule, studentData.barangay).map((step) => (
+              {getTimelineSteps(currentApp, schedule, studentData.barangay).reverse().map((step) => (
                 <div key={step.id} className={`mb-10 relative animate-fade-in ${step.state === "pending" ? "opacity-50 grayscale" : ""}`}>
                   <div className={`absolute -left-[35px] h-8 w-8 rounded-full flex items-center justify-center shadow-md border-4 border-white ${
                     step.state === "completed" ? "bg-emerald-500" : 
